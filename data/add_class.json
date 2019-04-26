@@ -1,0 +1,14 @@
+{
+  "data": [
+    {
+      "course_id":1241,
+      "course_name":"计算机工程训练",
+      "teacher":"池芝标",
+      "time":12414134
+    }
+  ],
+  "result_code":200,
+  "result_des":"获取成功",
+  "timestamp":"2019-3-27 15:14:55",
+  "request_id": 70895225
+}

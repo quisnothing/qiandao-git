@@ -1,0 +1,19 @@
+
+{
+  "data": {
+    "token":"1241412315123531",
+    "uid": "1",
+    "email": "12154545@qq.com",
+    "phone": "1244141",
+    "name":"xxx",
+    "nick_name": "用户_21421",
+    "gender":"男",
+    "type": 1,
+    "reg_time": "1436864169",
+    "last_login_time": "0"
+  },
+  "result_code":200,
+  "result_des":"返回成功",
+  "timestamp":"2019-3-27 15:14:55",
+  "request_id": 70895225
+}

@@ -1,0 +1,26 @@
+{
+  "data": [
+    {
+      "uid": "1",
+      "role":"管理员",
+      "role_remarks":"权限最高的角色",
+      "time":12414134
+    },
+    {
+      "uid": "2",
+      "role":"教师",
+      "role_remarks":"权限次高的角色",
+      "time":12414134
+    },
+    {
+      "uid": "3",
+      "role":"学生",
+      "role_remarks":"权限最低的角色",
+      "time":12414134
+    }
+  ],
+  "result_code":200,
+  "result_des":"获取成功",
+  "timestamp":"2019-3-27 15:14:55",
+  "request_id": 70895225
+}
