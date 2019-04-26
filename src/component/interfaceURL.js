@@ -426,6 +426,10 @@ export function AlterInfos(token, type_level, infoid, type_belong, info) {
 }
 export const change_type_info = 'http://167.179.75.22:16666/api/dict/info';
 
+//通过typename获得字典内容
+export function GetInfoByName(typename){
+    const get_types_by_name = baseURL+ '/api/dict/infos4name';
+}
 //获得角色信息
 
 export const get_role_list = '/data/user_list.json';

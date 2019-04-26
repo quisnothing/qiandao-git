@@ -1,5 +1,5 @@
 import React from 'react'
-import { Card,Icon,Layout,Row,Col,Tree,Form,Input,Button,Select } from 'antd';
+import { Card,Icon,Layout,Row,Col,Tree,Form,Input,Button,Select,Modal } from 'antd';
 import { Link  } from 'react-router-dom';
 import { connect } from 'react-redux'
 import BreadcrumbCustom from '../../../component/BreadcrumbCustom'
@@ -10,7 +10,7 @@ const { Header, Content, Footer } = Layout;
 const FormItem = Form.Item;
 const { TreeNode } = Tree;
 const Option = Select.Option;
-let result = [];
+let result = []; //保存当前选中的具体类别的所有信息(type_level, type_belong...)
 
 // 已知点击树节点可以获得该节点的id(infoid),所以需要找出其从属父节点的id(infoid)
 // 根据输入的信息查找treeData中符合id的item,因为用info可能会重名，所以用id
@@ -26,6 +26,26 @@ function FilterObj(item, keys){
         })
     }
 }
+//将原始数据整合成树结构
+function buildTree(list){
+    let temp = {};
+    let tree = {};
+    for(let i in list){
+        temp[list[i].id] = list[i];
+    }
+    for(let i in temp){
+        if(temp[i].type_belong) {
+            if(!temp[temp[i].type_belong].children) {
+                temp[temp[i].type_belong].children = new Object();
+            }
+            temp[temp[i].type_belong].children[temp[i].id] = temp[i];
+        } else {
+            tree[temp[i].id] =  temp[i];
+        }
+    }
+    return tree;
+}
+
 class DictType extends React.Component{
     constructor(){
         super();
@@ -34,6 +54,7 @@ class DictType extends React.Component{
             divheight: 280,
             selectedTypeId: '', //当前选定的大类Id
             selectedInfoId: '', //当前选定的类别id
+            ModalTypeId: '', //Modal框的选择框
             typedata: [],
             treeData: [
                 {info: '福州大学', id: 0, key: 'fzu'},
@@ -43,6 +64,7 @@ class DictType extends React.Component{
                 ]},
             ],
 
+            visibleOptionModal: false, //大类修改新增删除框是否显示
             ref_old_info: '',
             ref_new_info: '',
             ref_belong: '',
@@ -51,7 +73,30 @@ class DictType extends React.Component{
     handleSelect(value){
         // 选择大类后，根据typeid获得具体类别信息，并整合成树结构
         console.log(value); // value:typeid
-        this.setState({selectedTypeId: value});
+        if(value === 'lucy'){
+            this.setState({visibleOptionModal: true});
+        }
+        else{
+            this.setState({selectedTypeId: value});
+            let temp_token = localStorage.getItem("token");
+            URL.GetTypeChild(temp_token, value).then((res)=>{
+                if(res.data.result_code === '200'){
+                    console.log("success get type!");
+                    console.log(res);
+                    let t_tree = buildTree(res.data.data);
+                    //this.setState({treeData: t_tree});
+                }
+                else{
+                    console.log("fail!");
+                    console.log(res);
+                }
+            })
+        }
+
+    }
+    handleSelect2(value){
+        //处理modal模块内的选择框，value传入的是typeId
+        this.setState({ModalTypeId: value});
     }
 
     //点击树节点进行具体类别选择
@@ -137,6 +182,74 @@ class DictType extends React.Component{
         // })
     }
 
+    //创建具体类别信息
+    CreateInfos(){
+        //点击左侧树拿到父节点的全部信息后,type_level+1
+        let token = localStorage.getItem("token");
+        let type_level = result[0].type_level;
+        type_level = String((+type_level)+ 1);
+        let typeid = result[0].typeid;
+        let type_belong = result[0].type_belong;
+        let newinfo = this.state.ref_new_info.props.value;
+        URL.CreateInfo(token, typeid, type_level, type_belong, newinfo).then((res)=>{
+            if(res.data.result_code === '200'){
+                console.log("success create!");
+                //message.success('Processing complete!')
+            }
+        })
+    }
+
+    //删除具体类别
+    DeleteInfos(){
+        let token = localStorage.getItem("token");
+        let infoid = result[0].id;
+        URL.DelTypeInfo(token, infoid).then((res)=>{
+            if(res.data.result_code === '200'){
+                console.log("success delete!");
+                //message.success('Processing complete!')
+            }
+        })
+    }
+    //取消修改
+    OptionCancel(){
+        this.setState({visibleOptionModal:false})
+    }
+    //修改大类
+    AlterTypes(){
+        let t_typename = this.state.ref_new_info.props.value;
+        let token = localStorage.getItem("token");
+        URL.AlterType(token, t_typename, this.state.ModalTypeId).then((res)=>{
+            if(res.data.result_code === '200'){
+                console.log("success alter toptype!");
+                //message.success('Processing complete!')
+                this.setState({visibleOptionModal:false})
+            }
+        })
+    }
+    //新增大类
+    CreateTop(){
+        let t_typename = this.state.ref_new_info.props.value;
+        let token = localStorage.getItem("token");
+        URL.CreateType(token, t_typename).then((res)=>{
+            if(res.data.result_code === '200'){
+                console.log("success add toptype!");
+                //message.success('Processing complete!')
+                this.setState({visibleOptionModal:false})
+            }
+        })
+    }
+    //删除大类
+    DeleteTop(){
+        let token = localStorage.getItem("token");
+        URL.DelType(token, this.state.ModalTypeId).then((res)=>{
+            if(res.data.result_code === '200'){
+                console.log("success delete toptype!");
+                //message.success('Processing complete!')
+                this.setState({visibleOptionModal:false})
+            }
+        })
+    }
+
     render(){
         const { getFieldDecorator } = this.props.form;
         //表单布局
@@ -166,7 +279,7 @@ class DictType extends React.Component{
                             <Form>
                                 <FormItem {...formItemLayout} label="字典大类">
                                     <Select style={{ width: 120 }} onChange={this.handleSelect.bind(this)}>
-                                        <Option value="school_info">学校信息</Option>
+                                        <Option value="1">学校信息</Option>
                                         <Option value="lucy">其他信息</Option>
 
                                     </Select>
@@ -229,6 +342,38 @@ class DictType extends React.Component{
                         </Col>
                     </Row>
                 </div>
+                <Modal
+                    title="修改/新增/删除大类"
+                    visible={this.state.visibleOptionModal}
+                    onCancel={this.OptionCancel.bind(this)}
+                >
+                    <Form>
+                        <FormItem {...formItemLayout} label="类别旧称">
+                            <Select style={{ width: 120 }} onChange={this.handleSelect2.bind(this)}>
+                                <Option value="1">学校信息</Option>
+                            </Select>
+                        </FormItem>
+                        <FormItem {...formItemLayout} label="类别新称">
+                            {getFieldDecorator('type_new_name', {
+
+                                rules: [{ required: true, message: '请输入正确的类别名称!' }],
+                            })(
+                                <Input  ref={name=>this.state.ref_new_info=name} />
+                            )}
+                        </FormItem>
+                        <Row type="flex" justify="center">
+                            <Col>
+                                <Button type="primary" ghost onClick={this.AlterInfo.bind(this)}>修改</Button>
+                            </Col>
+                            <Col>
+                                <Button type="primary" ghost>新增</Button>
+                            </Col>
+                            <Col>
+                                <Button type="danger" ghost>删除</Button>
+                            </Col>
+                        </Row>
+                    </Form>
+                </Modal>
                 <div style={{ left:'50%', bottom: '10px', position: 'fixed' }}>
                     Ant Design ©2018 Created by Ant UED
                 </div>

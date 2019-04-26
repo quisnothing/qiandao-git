@@ -12,6 +12,70 @@ const { Header, Content, Footer } = Layout;
 const FormItem = Form.Item;
 const { TreeNode } = Tree;
 
+let infodata = [
+    {
+        id:1,
+        typeid:1,
+        type_level:1,
+        type_belong:0,
+        info:"福州大学",
+    },{
+        id:2,
+        typeid:1,  //大类别的id
+        type_level:1,
+        type_belong:0, // 类别从属的父id
+        info: "厦门大学",
+    },{
+        id:3,
+        typeid:1,  //大类别id
+        type_level:1,
+        type_belong:0, // 类别从属的父id
+        info: "其他大学",
+    },{
+        id:11,
+        typeid:1,  //大类别id
+        type_level:2,
+        type_belong:1, // 类别从属的父id
+        info: "福大数计学院",
+    },{
+        id:12,
+        typeid:1,  //大类别id
+        type_level:2,
+        type_belong:1, // 类别从属的父id
+        info: "福大经管学院",
+    },{
+        id:21,
+        typeid:1,  //大类别id
+        type_level:2,
+        type_belong:2, // 类别从属的父id
+        info: "厦大数计学院",
+    },{
+        id:22,
+        typeid:1,  //大类别id
+        type_level:2,
+        type_belong:2, // 类别从属的父id
+        info: "厦大金融学院",
+    }];
+
+function buildTree(list){
+    let temp = {};
+    let tree = {};
+    for(let i in list){
+        temp[list[i].id] = list[i];
+    }
+    for(let i in temp){
+        if(temp[i].type_belong) {
+            if(!temp[temp[i].type_belong].children) {
+                temp[temp[i].type_belong].children = new Object();
+            }
+            temp[temp[i].type_belong].children[temp[i].id] = temp[i];
+        } else {
+            tree[temp[i].id] =  temp[i];
+        }
+    }
+    return tree;
+}
+
 class DicList extends React.Component{
     constructor(){
         super();
@@ -30,6 +94,7 @@ class DicList extends React.Component{
         //this.state.selectedInstitute = info.node.props.title;
         console.log(info.halfCheckedKeys);
         console.log('selected',selectedKeys, info);  //输出选中的key和对应的类名字
+        console.log(buildTree(infodata));
     }
 
     //获得所有大类
