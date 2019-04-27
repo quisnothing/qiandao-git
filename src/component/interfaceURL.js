@@ -88,6 +88,26 @@ export function GetStuList(token, course_id){
 }
 export const get_student = 'http://167.179.75.22:16666/api/course/students';
 
+//添加学生到课程
+export function AddStuToCourse(token, stu_code, email, phone) {
+    const add_stu_to_course = baseURL+'/api/course/stu2course';
+    var fd = new FormData();
+    fd.append('token', token);
+    fd.append('stu_code', stu_code);
+    fd.append('email', email);
+    fd.append('phone', phone);
+    return new Promise((resolve, reject)=>{
+        axios.post(add_stu_to_course, fd, {headers: {"Content-Type": "multipart/form-data"}}
+        ).then((res)=>{
+            if(res.data.result_code ==='200'){
+                message.success("添加成功");
+            }
+            //console.log(res.data);
+            resolve(res)
+        })
+    })
+}
+
 //得到签到列表
 export function GetCheckList(token, course_id){
     const getChk = baseURL+'/api/course/checklist';

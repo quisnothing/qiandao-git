@@ -51,29 +51,74 @@ class Register extends React.Component{
             callback('请输入正确的电话号码!');
         }
     }
+    handleEmailChange(e){
+        this.setState({email: e.target.value}, function () {
+            console.log(this.state.email)
+        });
+    }
+    handleEmailCodeChange(e){
+        this.setState({email_code: e.target.value}, function () {
+            console.log(this.state.email_code)
+        });
+    }
+    handlePhoneChange(e){
+        this.setState({phone: e.target.value}, function () {
+            console.log(this.state.phone)
+        });
+    }
+    handlePassChange(e){
+        this.setState({password: e.target.value}, function () {
+            console.log(this.state.password)
+        });
+    }
+    handleNameChange(e){
+        this.setState({name: e.target.value}, function () {
+            console.log(this.state.name)
+        });
+    }
+    handleStuCodeChange(e){
+        this.setState({stu_code: e.target.value}, function () {
+            console.log(this.state.stu_code)
+        });
+    }
+    handleScChange(e){
+        this.setState({school: e.target.value}, function () {
+            console.log(this.state.school)
+        });
+    }
+    handleDpChange(e){
+        this.setState({department: e.target.value}, function () {
+            console.log(this.state.department)
+        });
+    }
+    handlePrfChange(e){
+        this.setState({profession: e.target.value}, function () {
+            console.log(this.state.profession)
+        });
+    }
     goNext(){
-        console.log(this.state.current);
+        //console.log(this.state.ref_em);
         if(this.state.current === 0){ //需要验证验证码是否正确
-            this.setState({email: this.state.ref_em.props.value,
-                email_code:this.state.ref_em_c.props.value}, function () {
-                console.log(this.state.email);
-                console.log(this.state.email_code);
-                const current1 = this.state.current + 1;
-                this.setState({current: current1});
-            });
-
+            // this.setState({email: this.state.ref_em.props.value,
+            //     email_code:this.state.ref_em_c.props.value}, function () {
+            //     console.log(this.state.email);
+            //     console.log(this.state.email_code);
+            //
+            // });
+            console.log(this.state.email);
+            console.log(this.state.email_code);
         }
         else if(this.state.current === 1){
-            //console.log(this.state.ref_p.state.value);
-            this.setState({phone: this.state.ref_p.props.value,
-                password: this.state.ref_pass.props.value
-                }, function () {
-                console.log(this.state.type);
-                const current1 = this.state.current + 1;
-                this.setState({current: current1});
-            })
+            console.log(this.state.password);
+            console.log(this.state.type);
+            // this.setState({phone: this.state.ref_p.props.value,
+            //     password: this.state.ref_pass.props.value
+            //     }, function () {
+            //     console.log(this.state.type);
+            // })
         }
-
+        const current1 = this.state.current + 1;
+        this.setState({current: current1});
     }
 
     goPrev(){
@@ -84,23 +129,25 @@ class Register extends React.Component{
 
     finish(){ //完成注册
         //首先保存表单信息
-        this.setState({name: this.state.ref_nam.props.value,
-            stu_code: this.state.ref_sc.props.value,
-            school: this.state.ref_sl.props.value,
-            department: this.state.ref_de.props.value,
-            profession: this.state.ref_prs.props.value}, function () {
-            console.log(this.state);
-            //然后发送注册信息
-            var origin_pass = this.state.password;
-            var md5_pass = hex_md5(origin_pass);
-            URL.UserRegister(this.state.email, this.state.email_code, this.state.phone,
-                md5_pass, this.state.type, this.state.name, this.state.stu_code,
-                this.state.school, this.state.department, this.state.profession).then((res)=>{
-                if(res.data.result_code === '200'){
-                    console.log("success register!");
-                    message.success('Processing complete!')
-                }
-            })
+        // this.setState({name: this.state.ref_nam.props.value,
+        //     stu_code: this.state.ref_sc.props.value,
+        //     school: this.state.ref_sl.props.value,
+        //     department: this.state.ref_de.props.value,
+        //     profession: this.state.ref_prs.props.value}, function () {
+        //     console.log(this.state);
+        //     //然后发送注册信息
+        //     var origin_pass = this.state.password;
+        //     var md5_pass = hex_md5(origin_pass);
+        //
+        // })
+        console.log(this.state);
+        URL.UserRegister(this.state.email, this.state.email_code, this.state.phone,
+            hex_md5(this.state.password), this.state.type, this.state.name, this.state.stu_code,
+            this.state.school, this.state.department, this.state.profession).then((res)=>{
+            if(res.data.result_code === '200'){
+                console.log("success register!");
+                message.success('Processing complete!')
+            }
         })
     }
 
@@ -153,7 +200,10 @@ class Register extends React.Component{
                     {getFieldDecorator('email', {
                         rules: [{ required: true, message: '请输入邮箱!' }]
                     })(
-                        <Input placeholder="请输入邮箱" ref={name=>this.state.ref_em=name} />
+                        <Input placeholder="请输入邮箱"
+                               ref={name=>this.state.ref_em=name}
+                               onChange={this.handleEmailChange.bind(this)}
+                        />
                     )}
                 </FormItem>
                 <FormItem
@@ -167,7 +217,11 @@ class Register extends React.Component{
                     })(
                         <div className="yzm-box">
                             <Row gutter={16}>
-                                <Col span={10}><Input  placeholder="请输入验证码" ref={name=>this.state.ref_em_c=name} /></Col>
+                                <Col span={10}><Input  placeholder="请输入验证码"
+                                                       ref={name=>this.state.ref_em_c=name}
+                                                       onChange={this.handleEmailCodeChange.bind(this)}
+                                               />
+                                </Col>
                                 <Col span={6}> <Button  className="btnStore" onClick={this.onGetCode.bind(this)}>获取验证码</Button></Col>
                             </Row>
                         </div>
@@ -189,7 +243,10 @@ class Register extends React.Component{
                                 {validator: this.onPhoneRq}
                             ]
                         })(
-                            <Input placeholder="请输入手机号" ref={name=>this.state.ref_p=name} />
+                            <Input placeholder="请输入手机号"
+                                   ref={name=>this.state.ref_p=name}
+                                   onChange={this.handlePhoneChange.bind(this)}
+                            />
                         )}
                     </FormItem>
                     <FormItem {...formItemLayout} label="密码">
@@ -197,7 +254,10 @@ class Register extends React.Component{
                             rules: [{ required: true, message: '请输入密码！' }],
                         })(
                             <Input prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />}
-                                   type="password" placeholder="密码" ref={name=>this.state.ref_pass=name} />
+                                   type="password" placeholder="密码"
+                                   ref={name=>this.state.ref_pass=name}
+                                   onChange={this.handlePassChange.bind(this)}
+                            />
                         )}
                     </FormItem>
                     <FormItem {...formItemLayout} label="用户类型">
@@ -224,7 +284,10 @@ class Register extends React.Component{
                         {getFieldDecorator('name', {
                             rules: [{ required: true, message: '请输入姓名!' }]
                         })(
-                            <Input placeholder="请输入姓名" ref={name=>this.state.ref_nam=name} />
+                            <Input placeholder="请输入姓名"
+                                   ref={name=>this.state.ref_nam=name}
+                                   onChange={this.handleNameChange.bind(this)}
+                            />
                         )}
                     </FormItem>
                     <FormItem
@@ -232,9 +295,12 @@ class Register extends React.Component{
                         label="学号"
                         hasFeedback>
                         {getFieldDecorator('stu_code', {
-                            rules: [{ required: true, message: '请输入学号!' }]
+                            rules: [{ message: '请输入学号!' }]
                         })(
-                            <Input placeholder="请输入学号" ref={name=>this.state.ref_sc=name} />
+                            <Input placeholder="请输入学号"
+                                   ref={name=>this.state.ref_sc=name}
+                                   onChange={this.handleStuCodeChange.bind(this)}
+                            />
                         )}
                     </FormItem>
                     <FormItem
@@ -244,7 +310,10 @@ class Register extends React.Component{
                         {getFieldDecorator('school', {
                             rules: [{ required: true, message: '请输入学校!' }]
                         })(
-                            <Input placeholder="请输入学校" ref={name=>this.state.ref_sl=name} />
+                            <Input placeholder="请输入学校"
+                                   ref={name=>this.state.ref_sl=name}
+                                   onChange={this.handleScChange.bind(this)}
+                            />
                         )}
                     </FormItem>
                     <FormItem
@@ -252,7 +321,10 @@ class Register extends React.Component{
                         label="学院"
                         hasFeedback>
                         {getFieldDecorator('department')(
-                            <Input placeholder="请输入学院" ref={name=>this.state.ref_de=name} />
+                            <Input placeholder="请输入学院"
+                                   ref={name=>this.state.ref_de=name}
+                                   onChange={this.handleDpChange.bind(this)}
+                            />
                         )}
                     </FormItem>
                     <FormItem
@@ -260,7 +332,10 @@ class Register extends React.Component{
                         label="专业"
                         hasFeedback>
                         {getFieldDecorator('profession')(
-                            <Input placeholder="请输入专业" ref={name=>this.state.ref_prs=name} />
+                            <Input placeholder="请输入专业"
+                                   ref={name=>this.state.ref_prs=name}
+                                   onChange={this.handlePrfChange.bind(this)}
+                            />
                         )}
                     </FormItem>
                 </Form>

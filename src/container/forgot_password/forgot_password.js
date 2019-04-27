@@ -47,9 +47,15 @@ class ForgotPassword extends React.Component{
             }
         })
     }
+    onEmailChange(e){
+        this.setState({em: e.target.value}, function () {
+            console.log(e.target.value);
+        });
+
+    }
     getVerifyCode(){  //获取验证码
-        console.log(this.state.em.props.value);
-        URL.GetEmailCode(this.state.em.props.value).then((res)=>{
+        console.log(this.state.em);
+        URL.GetEmailCode(this.state.em).then((res)=>{
             console.log('success');
             console.log(res)
         })
@@ -116,7 +122,7 @@ class ForgotPassword extends React.Component{
                                     required: true, message: 'P请输入邮箱!',
                                 }],
                             })(
-                                <Input ref={name=>this.state.em=name} />
+                                <Input onChange={this.onEmailChange.bind(this)} />
                             )}
                         </FormItem>
                         <FormItem label="手机号">

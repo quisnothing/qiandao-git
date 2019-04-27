@@ -43,7 +43,7 @@ class QueryStudent extends React.Component{
         super();
         this.state={
             selectedRowKeys: [],
-            data: [],
+            data: [],  // student list
             pagination: {
                 pageSize:10,
                 current:1,
@@ -65,11 +65,29 @@ class QueryStudent extends React.Component{
         this.turnStatus = "NORMAL"; //NORMAL正常翻页
         this.searchContent = "" ;//搜索内容
     }
+    componentWillMount(){
+        let data = this.props.location.query;
+        console.log(data);
+        //通过传递过来的course_id获取对应的学生列表
+        let token1 = localStorage.getItem("token");
+        URL.GetStuList(token1, data.a).then((res)=>{
+            if(res.data.result_code === '200'){
+                console.log("success get student list!");
+                this.setState({data: res.data.data});
+            }
+            else if(res.data.result_code === '206'){
+                console.log("token time out!")
+                message.error("token time out!")
+            }else{
+                console.log(res);
+            }
+        })
+    }
 
     //选择某一行
     onSelectChange(selectedRowKeys){
         console.log('selectedRowKeys changed: ', selectedRowKeys);
-        this.setState({ selectedRowKeys });
+        this.setState({ selectedRowKeys: selectedRowKeys });
     }
 
     //得到搜索的数据
