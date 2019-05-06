@@ -51,11 +51,12 @@ class QueryStudent extends React.Component{
                 defaultCurrent:1,
             },
             visibleChangeModal: false, //修改框是否显示
-            curSelectClass:{ //当前选中的学生
+            curSelectClass:{ //当前选中的学生列
                 key: 0,
+                id: '',
                 name: "",
                 profession: "",
-                studentId: 1,
+                stu_code: '',
             },
             classInfo: [], //班级/专业信息
             college: '',
@@ -70,18 +71,33 @@ class QueryStudent extends React.Component{
         console.log(data);
         //通过传递过来的course_id获取对应的学生列表
         let token1 = localStorage.getItem("token");
-        URL.GetStuList(token1, data.a).then((res)=>{
-            if(res.data.result_code === '200'){
-                console.log("success get student list!");
-                this.setState({data: res.data.data});
-            }
-            else if(res.data.result_code === '206'){
-                console.log("token time out!")
-                message.error("token time out!")
-            }else{
-                console.log(res);
-            }
-        })
+        // URL.GetStuList(token1, data.a).then((res)=>{
+        //     if(res.data.result_code === '200'){
+        //         console.log("success get student list!");
+        //         const data = [];
+        //         for (let i = 0; i < res.data.data.length; i++) {
+        //
+        //             data.push({
+        //                 key: res.data.data[i].uid,
+        //                 stu_code:res.data.data[i].name,
+        //                 name:res.data.data[i].name,
+        //                 gender:res.data.data[i].gender,
+        //                 school:res.data.data[i].school,
+        //                 department:res.data.data[i].department,
+        //                 profession:res.data.data[i].profession,
+        //                 phone:res.data.data[i].phone,
+        //                 lack_count:res.data.data[i].lack_count
+        //             });
+        //         }
+        //         this.setState({data: data});
+        //     }
+        //     else if(res.data.result_code === '206'){
+        //         console.log("token time out!");
+        //         message.error("token time out!");
+        //     }else{
+        //         console.log(res.data);
+        //     }
+        // })
     }
 
     //选择某一行
@@ -101,6 +117,7 @@ class QueryStudent extends React.Component{
             const data = [];
             for(let i = 0; i<res.data.data.length;i++){
                 data.push({
+                    key: res.data.data[i].uid,
                     stu_code:res.data.data[i].name,
                     name:res.data.data[i].name,
                     gender:res.data.data[i].gender,
@@ -125,7 +142,7 @@ class QueryStudent extends React.Component{
         console.log(value);
     }
 
-    handleCollegeChange(value){
+    handleCollegeChange(value){ //级联菜单的改变
         console.log(value);
 
     }
@@ -156,19 +173,46 @@ class QueryStudent extends React.Component{
         this.setState({visibleChangeModal:false});
         this.props.form.validateFieldsAndScroll((err,values)=>{
             if(!err){
+                let token1 = localStorage.getItem("token");
+                URL.AlterStuInfo(token1, this.state.curSelectClass.id, values.lack_count).then((res)=>{
+                    if(res.data.result_code === '200'){
+                        console.log("alter success!");
+                        this.setState({visibleChangeModal:false});
+                    }
 
+                })
             }
         });
     }
 
+    //打开修改学生列表界面
+    ChangeStuList(record){
+        let data = {key: 0};
+        data["id"] = record.id;
+        data["stu_code"] = record.stu_code;
+        data["name"] = record.name;
+        data["profession"] = record.profession;
+        this.setState({curSelectClass:data}, function () {
+            this.setState({visibleChangeModal: true});
+        })
+    }
+    //删除学生列表
+    DelStuList(){
+
+    }
     render(){
         const { getFieldDecorator } = this.props.form;
         const columns = [
             {
+                title: '编号',
+                dataIndex: 'id',
+                key: 'id'
+            },
+            {
                 title: '学号',
-                dataIndex: 'studentId',
-                key: 'studentId',
-                sorter: (a,b) => a.studentId.length-b.studentId.length
+                dataIndex: 'stu_code',
+                key: 'stu_code',
+                sorter: (a,b) => a.stu_code.length-b.stu_code.length
             },
             {
                 title: '姓名',
@@ -188,7 +232,7 @@ class QueryStudent extends React.Component{
                     <span>
                         <Button type="danger" size="small">删除</Button>
                         <Divider type="vertical"/>
-                        <Button size="small">修改</Button>
+                        <Button size="small" onClick={this.ChangeStuList.bind(this, record)}>修改</Button>
                     </span>
                 )
             }
@@ -261,27 +305,20 @@ class QueryStudent extends React.Component{
                         onCancel={this.changeCancel.bind(this)}
                     >
                         <Form onSubmit={this.changeOK.bind(this)}>
+                            <FormItem {...formItemLayout} label="编号">
+                                <span>{this.state.curSelectClass.id}</span>
+                            </FormItem>
                             <FormItem {...formItemLayout} label="学号">
-                                <span>{this.state.curSelectClass.studentId}</span>
+                                <span>{this.state.curSelectClass.stu_code}</span>
                             </FormItem>
                             <FormItem {...formItemLayout} label="姓名">
-                                {getFieldDecorator('name', {
-                                    initialValue: this.state.curSelectClass.name
-                                }) (
-                                    <Input />
-                                )}
+                                <span>{this.state.curSelectClass.name}</span>
                             </FormItem>
                             <FormItem {...formItemLayout} label="专业">
-                                {getFieldDecorator('class', {
-                                    initialValue: this.state.curSelectClass.class
-                                }) (
-                                    <Select style={{ width: '100%' }} onChange={this.handleChange.bind(this)}>
-                                        {classArr}
-                                    </Select>
-                                )}
+                                <span>{this.state.curSelectClass.profession}</span>
                             </FormItem>
-                            <FormItem {...formItemLayout} label="登录密码">
-                                {getFieldDecorator('password', {
+                            <FormItem {...formItemLayout} label="缺勤次数">
+                                {getFieldDecorator('lack_count', {
 
                                 }) (
                                     <Input />

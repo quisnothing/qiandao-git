@@ -15,7 +15,8 @@ class AddStudent extends React.Component{
         super();
         this.state={
             pathList: ['学生管理', '添加学生到课程'], //面包屑路径
-            subjects: []
+            subjects: [],
+            selectCourseId: ''
         }
     }
     componentWillMount(){
@@ -59,6 +60,7 @@ class AddStudent extends React.Component{
     }
     handleChange(value){
         //console.log(`selected ${value}`);
+        this.setState({selectCourseId: value});
     }
 
     handleSubmit(e){
@@ -66,7 +68,8 @@ class AddStudent extends React.Component{
         this.props.form.validateFields((err, values)=>{
             if (!err){
                 let token1 = localStorage.getItem("token");
-                URL.AddStuToCourse(token1, values.stu_code, values.email, values.phone).then((res)=>{
+                let courseId = this.state.selectCourseId;
+                URL.AddStuToCourse(token1, values.stu_code, values.email, values.phone, courseId).then((res)=>{
                     if(res.data.result_code === '200'){
                         console.log("success to add student to course!");
                     }

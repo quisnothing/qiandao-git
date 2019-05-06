@@ -120,7 +120,7 @@ class AddClass extends React.Component{
     }
 
     //选择某一行
-    onSelectChange(selectedRowKeys) {
+    onSelectChange(selectedRowKeys, selectedRows) {
         console.log('selectedRowKeys changed: ', selectedRowKeys);
         this.setState({ selectedRowKeys: selectedRowKeys });
     }
@@ -239,6 +239,14 @@ class AddClass extends React.Component{
             pathname: '/main/student_manage/query_student',
             query: {a:this.state.selectedRowKeys[0]},
         };
+        let path2 = {
+            pathname: '/main/class_manage/class_info',
+            query: {id: this.state.selectedRowKeys[0]},
+        };
+        let path3 = {
+            pathname: '/main/signin_manage/querySign',
+            query: {id: this.state.selectedRowKeys[0]},
+        }
         //行选择
         const rowSelection = {
             selectedRowKeys : this.state.selectedRowKeys,
@@ -247,7 +255,7 @@ class AddClass extends React.Component{
         const menu = (
             <Menu>
                 <Menu.Item>
-                    <a target="_blank" rel="noopener noreferrer">课程详情</a>
+                    <Link to={path2}>课程详情</Link>
                 </Menu.Item>
                 <Menu.Item>
                     <Link to={path1}>学生列表</Link>

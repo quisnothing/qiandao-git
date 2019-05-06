@@ -37,6 +37,33 @@ class QuerySignIn extends React.Component{
 
     componentWillMount(){
         this.setState({roleSet : localStorage.getItem("roleSet")});
+        //需要根据传过来的course_id获得签到列表
+        let data = this.props.location.query;
+        let token1 = localStorage.getItem("token");
+        // URL.GetCheckList(token1, data.id).then((res)=>{
+        //     if(res.data.result_code === '200'){
+        //         console.log("success get signIn list!");
+        //         const data = [];
+        //         for (let i = 0; i < res.data.data.length; i++) {
+        //
+        //             data.push({
+        //                 key: res.data.data[i].uid,
+        //                 studentId: res.data.data[i].stu_code,
+        //                 name: res.data.data[i].name,
+        //                 check_state: res.data.data[i].check_state,
+        //                 check_count: res.data.data[i].count,
+        //                 remarks: res.data.data[i].remarks
+        //             });
+        //         }
+        //         this.setState({data: data});
+        //     }
+        //     else if(res.data.result_code === '206'){
+        //         console.log("token time out!");
+        //         message.error("token time out!");
+        //     }else{
+        //         console.log(res.data);
+        //     }
+        // })
     }
 
     //得到一页数据

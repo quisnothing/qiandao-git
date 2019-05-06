@@ -146,7 +146,10 @@ class Register extends React.Component{
             this.state.school, this.state.department, this.state.profession).then((res)=>{
             if(res.data.result_code === '200'){
                 console.log("success register!");
-                message.success('Processing complete!')
+                //message.success('Processing complete!')
+            }
+            else{
+                console.log(res.data.result_desc);
             }
         })
     }

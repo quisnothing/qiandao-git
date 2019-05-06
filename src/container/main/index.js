@@ -16,6 +16,7 @@ import CallSignIn from './signin_manage/call_signin'
 import QuerySignIn from './signin_manage/querySign'
 import AddClass from './class_manage/add_class'
 import QueryClass from './class_manage/query_class'
+import ClassInfo from './class_manage/class_info'
 import ChangePassword from './personal_center/change_password'
 import ChangeInformation from './personal_center/change_informatioon'
 import DicList from './dic_manage/dic_list'
@@ -155,6 +156,7 @@ class Main extends React.Component{
                            <Route path="/main/teacher_manage/query_teacher" component={QueryTeacher}/>
                            <Route path="/main/class_manage/add_class" component={AddClass}/>
                            <Route path="/main/class_manage/query_class" component={QueryClass}/>
+                           <Route path="/main/class_manage/class_info" component={ClassInfo}/>
                            <Route path="/main/personal_center/change_password" component={ChangePassword}/>
                            <Route path="/main/personal_center/change_information" component={ChangeInformation}/>
                            <Route path="/main/dic_manage/dic_list" component={DicList}/>

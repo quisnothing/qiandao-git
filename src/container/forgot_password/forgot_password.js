@@ -41,8 +41,13 @@ class ForgotPassword extends React.Component{
                 console.log('submit!');
                 //console.log(values.verifyCode);
                 URL.ForgotPass(token, t_email, t_vCode, old_pwd, new_pwd).then((res)=>{
-                    console.log("success");
-                    console.log(res)
+                    if(res.result_code === '200'){
+                        console.log("success");
+                    }
+                    else{
+                        console.log(res)
+                    }
+
                 })
             }
         })
@@ -67,7 +72,7 @@ class ForgotPassword extends React.Component{
         const formItemLayout = {
             labelCol: {
                 xs: {span:24},
-                sm:{span:8},
+                sm:{span:4, offset:4},
             },
             wrapperCol:{
                 xs:{span:24},
@@ -91,30 +96,30 @@ class ForgotPassword extends React.Component{
                     </Col>
                 </Row>
                 <div className="forgot-password-content">
-                    <Form {...formItemLayout} onSubmit={this.handleSubmit.bind(this)}>
+                    <Form onSubmit={this.handleSubmit.bind(this)}>
 
-                        <FormItem label="用户名">
+                        <FormItem {...formItemLayout} label="用户名">
                             {getFieldDecorator('userName', {
                                 rules: [{ required: true, message: '请输入用户名！' }],
                             })(
                                 <Input prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="用户名" />
                             )}
                         </FormItem>
-                        <FormItem label="新密码">
+                        <FormItem {...formItemLayout} label="新密码">
                             {getFieldDecorator('password', {
                                 rules: [{ required: true, message: '请输入密码！' }],
                             })(
                                 <Input prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />} type="password" placeholder="新密码" />
                             )}
                         </FormItem>
-                        <FormItem label="确认密码">
+                        <FormItem {...formItemLayout} label="确认密码">
                             {getFieldDecorator('password1', {
                                 rules: [{ required: true, message: '请确认密码！' }],
                             })(
                                 <Input prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />} type="password" placeholder="确认密码" />
                             )}
                         </FormItem>
-                        <FormItem label="邮箱">
+                        <FormItem {...formItemLayout} label="邮箱">
                             {getFieldDecorator('email', {
                                 rules: [{
                                     type: 'email', message: '输入不是邮箱名！',
@@ -125,14 +130,14 @@ class ForgotPassword extends React.Component{
                                 <Input onChange={this.onEmailChange.bind(this)} />
                             )}
                         </FormItem>
-                        <FormItem label="手机号">
+                        <FormItem {...formItemLayout} label="手机号">
                             {getFieldDecorator('phone_number', {
                                 rules: [{ required: true, message: '请输入手机号!' }],
                             })(
                                 <Input addonBefore={prefixSelector} style={{ width: '100%' }}/>
                             )}
                         </FormItem>
-                        <FormItem label="验证码">
+                        <FormItem {...formItemLayout} label="验证码">
                             <Row gutter={8}>
                                 <Col span={12}>
                                     {getFieldDecorator('vCode',{

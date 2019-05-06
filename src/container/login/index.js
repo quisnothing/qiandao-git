@@ -44,6 +44,7 @@ class Login extends React.Component{
                     }
                     else{
                         message.error("登录失败！");
+                        console.log(res);
                     }
                 })
                 // httpServer({

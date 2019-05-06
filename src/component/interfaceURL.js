@@ -14,6 +14,9 @@ export function UserLogin(usrname, password){
         ).then((res)=>{
             if(res.data.result_code ==='200'){
                 message.success("登录成功");
+            }else{
+                console.log(res.data);
+                message.error("登录失败");
             }
             //console.log(res.data);
             resolve(res)
@@ -45,6 +48,9 @@ export function UserRegister(email,email_code, phone, password, type, name,
         ).then((res)=>{
             if(res.data.result_code ==='200'){
                 message.success("注册成功");
+            }else{
+                console.log(res.data)
+                message.error("注册失败");
             }
             //console.log(res.data);
             resolve(res)
@@ -67,6 +73,9 @@ export function ForgotPass(token, email, email_code, old_pwd, new_pwd) {
             //console.log(res.data);
             if(res.data.result_code ==='200'){
                 message.success("修改成功");
+            }else{
+                console.log(res.data)
+                message.error("修改失败");
             }
             resolve(res)
         })
@@ -101,10 +110,55 @@ export function AddStuToCourse(token, stu_code, email, phone) {
         ).then((res)=>{
             if(res.data.result_code ==='200'){
                 message.success("添加成功");
+            }else{
+                console.log(res.data)
+                message.error("添加失败");
             }
             //console.log(res.data);
             resolve(res)
         })
+    })
+}
+
+//修改学生列表
+export function AlterStuInfo(token, id, lack_count) {
+    const alter_stu_info = baseURL + '/api/course/students';
+    var fd = new FormData();
+    fd.append('token', token);
+    fd.append('id', id);
+    fd.append('lack_count', lack_count);
+    return new Promise((resolve, reject)=>{
+        axios.put(alter_stu_info, fd, {headers: {"Content-Type": "multipart/form-data"}}
+        ).then((res)=>{
+            //console.log(res.data);
+            if(res.data.result_code ==='200'){
+                message.success("修改成功");
+            }else{
+                console.log(res.data);
+                message.error("修改失败");
+            }
+            resolve(res)
+        })
+    })
+}
+
+//删除学生列表
+export function DelStuinfo(token, uid, course_id) {
+    const del_stu_info = baseURL + '/api/course/students';
+    var fd = new FormData();
+    fd.append('token', token);
+    fd.append('uid', uid);
+    fd.append('course_id', course_id);
+    axios.delete(del_stu_info, {params:fd, headers: {"Content-Type": "multipart/form-data"}}
+    ).then((res)=>{
+        //console.log(res.data);
+        if(res.data.result_code ==='200'){
+            message.success("删除成功");
+        }else{
+            console.log(res.data);
+            message.error("删除失败");
+        }
+        resolve(res)
     })
 }
 
@@ -135,6 +189,9 @@ export function AddCourse(token, uid, course_id) {
         ).then((res)=>{
             if(res.data.result_code ==='200'){
                 message.success("添加成功");
+            }else{
+                console.log(res.data)
+                message.error("添加失败");
             }
             //console.log(res.data);
             resolve(res)
@@ -196,6 +253,9 @@ export function CreateCourse(token, uid, course_name, place, location, time, stu
         ).then((res)=>{
             if(res.data.result_code ==='200'){
                 message.success("创建成功");
+            }else{
+                console.log(res.data)
+                message.error("创建失败");
             }
             //console.log(res.data);
             resolve(res)
@@ -230,6 +290,9 @@ export function AlterCourse(token, course_id, course_name, course_code, place, l
             //console.log(res.data);
             if(res.data.result_code ==='200'){
                 message.success("修改成功");
+            }else{
+                console.log(res.data)
+                message.error("修改失败");
             }
             resolve(res)
         })
@@ -269,6 +332,9 @@ export function CreateType(token, typename) {
         ).then((res)=>{
             if(res.data.result_code ==='200'){
                 message.success("创建成功");
+            }else{
+                console.log(res.data)
+                message.error("创建失败");
             }
             //console.log(res.data);
             resolve(res)
@@ -297,6 +363,9 @@ export function CreateInfo(token, typeid, type_level, type_belong, info) {
         ).then((res)=>{
             if(res.data.result_code ==='200'){
                 message.success("创建成功");
+            }else{
+                console.log(res.data)
+                message.error("创建失败");
             }
             //console.log(res.data);
             resolve(res)
@@ -354,6 +423,9 @@ export function DelType(token, typeid) {
             //console.log(res.data);
             if(res.data.result_code ==='200'){
                 message.success("删除成功");
+            }else{
+                console.log(res.data)
+                message.error("删除失败");
             }
             resolve(res)
         })
@@ -379,6 +451,9 @@ export function DelTypeInfo(token, infoid) {
             //console.log(res.data);
             if(res.data.result_code ==='200'){
                 message.success("删除成功");
+            }else{
+                console.log(res.data)
+                message.error("删除失败");
             }
             resolve(res)
         })
@@ -405,6 +480,9 @@ export function AlterType(token, typename, typeid) {
             //console.log(res.data);
             if(res.data.result_code ==='200'){
                 message.success("修改成功");
+            }else{
+                console.log(res.data)
+                message.error("删除失败");
             }
             resolve(res)
         })
@@ -433,6 +511,9 @@ export function AlterInfos(token, type_level, infoid, type_belong, info) {
             //console.log(res.data);
             if(res.data.result_code ==='200'){
                 message.success("修改成功");
+            }else{
+                console.log(res.data)
+                message.error("修改失败");
             }
             resolve(res)
         })
@@ -465,6 +546,9 @@ export function GetEmailCode(email) {
             //console.log(res.data);
             if(res.data.result_code ==='200'){
                 message.success("验证码已发送至邮箱");
+            }else{
+                console.log(res.data)
+                message.error("验证码发送失败");
             }
             resolve(res)
         })
