@@ -42,8 +42,22 @@ class QueryStudent extends React.Component{
     constructor(){
         super();
         this.state={
+            currentCourseId : '',
             selectedRowKeys: [],
-            data: [],  // student list
+            selectedRows: [],
+            data: [{
+                key: '1231',
+                id:"1231",
+                uid:"121412",
+                stu_code:"1241241",
+                name:"张三",
+                gender:"男",
+                school:"福大",
+                department:"数计学院",
+                profession:"计算机专业",
+                phone:"",
+                lack_count:""
+            }],  // student list
             pagination: {
                 pageSize:10,
                 current:1,
@@ -69,6 +83,7 @@ class QueryStudent extends React.Component{
     componentWillMount(){
         let data = this.props.location.query;
         console.log(data);
+        this.setState({currentCourseId: data.a});
         //通过传递过来的course_id获取对应的学生列表
         let token1 = localStorage.getItem("token");
         // URL.GetStuList(token1, data.a).then((res)=>{
@@ -101,9 +116,43 @@ class QueryStudent extends React.Component{
     }
 
     //选择某一行
-    onSelectChange(selectedRowKeys){
+    onSelectChange(selectedRowKeys, selectedRows){
         console.log('selectedRowKeys changed: ', selectedRowKeys);
-        this.setState({ selectedRowKeys: selectedRowKeys });
+        this.setState({ selectedRowKeys: selectedRowKeys, selectedRows:selectedRows });
+    }
+
+    //刷新列表
+    SyncOption(){
+        let token1 = localStorage.getItem("token");
+        URL.GetStuList(token1, this.state.currentCourseId).then((res)=>{
+            if(res.data.result_code === '200'){
+                console.log("success get student list!");
+                const data = [];
+                for (let i = 0; i < res.data.data.length; i++) {
+
+                    data.push({
+                        key: res.data.data[i].id,
+                        id:res.data.data[i].id,
+                        uid:res.data.data[i].uid,
+                        stu_code:res.data.data[i].name,
+                        name:res.data.data[i].name,
+                        gender:res.data.data[i].gender,
+                        school:res.data.data[i].school,
+                        department:res.data.data[i].department,
+                        profession:res.data.data[i].profession,
+                        phone:res.data.data[i].phone,
+                        lack_count:res.data.data[i].lack_count
+                    });
+                }
+                this.setState({data: data});
+            }
+            else if(res.data.result_code === '206'){
+                console.log("token time out!");
+                message.error("token time out!");
+            }else{
+                console.log(res.data);
+            }
+        })
     }
 
     //得到搜索的数据
@@ -149,7 +198,7 @@ class QueryStudent extends React.Component{
 
     //点击搜索
     searchContent(value) {
-        if(value == ""){
+        if(value === ""){
             Modal.error({
                 content: "搜索内容不能为空！",
                 okText: "确定"
@@ -170,7 +219,7 @@ class QueryStudent extends React.Component{
 
     //确认修改
     changeOK(){
-        this.setState({visibleChangeModal:false});
+        //this.setState({visibleChangeModal:false});
         this.props.form.validateFieldsAndScroll((err,values)=>{
             if(!err){
                 let token1 = localStorage.getItem("token");
@@ -198,7 +247,13 @@ class QueryStudent extends React.Component{
     }
     //删除学生列表
     DelStuList(){
+        let token1 = localStorage.getItem("token");
+        URL.DelStuinfo(token1, this.state.selectedRows[0].uid).then((res)=>{
+            if(res.data.result_code === '200'){
+                console.log("alter success!");
 
+            }
+        })
     }
     render(){
         const { getFieldDecorator } = this.props.form;
@@ -221,6 +276,16 @@ class QueryStudent extends React.Component{
                 sorter: (a,b) => a.name.length-b.name.length
             },
             {
+                title: '学校',
+                dataIndex: 'school',
+                key: 'school',
+            },
+            {
+                title: '学院',
+                dataIndex: 'department',
+                key: 'department',
+            },
+            {
                 title: '专业',
                 dataIndex: 'profession',
                 key: 'profession',
@@ -230,7 +295,7 @@ class QueryStudent extends React.Component{
                 key: 'action',
                 render: (text, record)=>(
                     <span>
-                        <Button type="danger" size="small">删除</Button>
+                        <Button type="danger" size="small" onClick={this.DelStuList.bind(this)}>删除</Button>
                         <Divider type="vertical"/>
                         <Button size="small" onClick={this.ChangeStuList.bind(this, record)}>修改</Button>
                     </span>
@@ -292,6 +357,7 @@ class QueryStudent extends React.Component{
                     </Row>
                     <div className="m-t-20">
                         <Table
+                            rowSelection={rowSelection}
                             columns={columns}
                             dataSource={this.state.data}
                             pagination={this.state.pagination}
@@ -305,7 +371,7 @@ class QueryStudent extends React.Component{
                         onCancel={this.changeCancel.bind(this)}
                     >
                         <Form onSubmit={this.changeOK.bind(this)}>
-                            <FormItem {...formItemLayout} label="编号">
+                            <FormItem {...formItemLayout} label="记录编号">
                                 <span>{this.state.curSelectClass.id}</span>
                             </FormItem>
                             <FormItem {...formItemLayout} label="学号">

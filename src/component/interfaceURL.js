@@ -177,6 +177,50 @@ export function GetCheckList(token, course_id){
 }
 export const query_signin = 'http://167.179.75.22:16666/api/course/checklist';
 
+//修改签到列表
+export function AlterSignList(token, id, remarks, distance) {
+    const alter_sign_list = baseURL + '/api/course/checklist';
+    var fd = new FormData();
+    fd.append('token', token);
+    fd.append('id', id);
+    fd.append('remarks', remarks);
+    fd.append('distance', distance);
+    return new Promise((resolve, reject)=>{
+        axios.put(alter_sign_list, fd, {headers: {"Content-Type": "multipart/form-data"}}
+        ).then((res)=>{
+            //console.log(res.data);
+            if(res.data.result_code ==='200'){
+                message.success("修改成功");
+            }else{
+                console.log(res.data);
+                message.error("修改失败");
+            }
+            resolve(res)
+        })
+    })
+}
+
+//删除签到列表
+export function DelSignList(token, id) {
+    const del_sign_list = baseURL + '/api/course/checklist';
+    var fd = new FormData();
+    fd.append('token', token);
+    fd.append('id', id);
+    return new Promise((resolve, reject)=>{
+        axios.delete(del_sign_list, {params:fd, headers: {"Content-Type": "multipart/form-data"}}
+        ).then((res)=>{
+            //console.log(res.data);
+            if(res.data.result_code ==='200'){
+                message.success("删除成功");
+            }else{
+                console.log(res.data);
+                message.error("删除失败");
+            }
+            resolve(res)
+        })
+    })
+}
+
 //添加课程
 export function AddCourse(token, uid, course_id) {
     const add_course = baseURL+'/api/course/add';
