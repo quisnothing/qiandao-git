@@ -31,6 +31,7 @@ class Login extends React.Component{
                     if(res.data.result_code === '200'){
                         console.log("success login!");
                         //message.success('登录成功!');
+                        console.log(res.data.data.token);
                         this.props.userinfoActions.login({
                             userName: values.userName
                         });

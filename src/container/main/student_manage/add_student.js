@@ -44,6 +44,7 @@ class AddStudent extends React.Component{
                     this.setState({
                         subjects: data
                     });
+                    console.log(data);
                     localStorage.setItem("subjects", JSON.stringify(data));
                 }else{
                     console.log("fail get!");
@@ -59,7 +60,7 @@ class AddStudent extends React.Component{
         }
     }
     handleChange(value){
-        //console.log(`selected ${value}`);
+        console.log(`selected ${value}`);
         this.setState({selectCourseId: value});
     }
 

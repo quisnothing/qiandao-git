@@ -208,7 +208,8 @@ class AddClass extends React.Component{
             if(!err){
                 let token = localStorage.getItem("token");
                 let uid = localStorage.getItem("uid");
-                console.log(values);
+                console.log(token);
+                console.log(uid);
                 URL.CreateCourse(token, uid, values.name, values.place, values.location, values.time,
                     values.stu_count, values.teacher).then((res)=>{
                     if(res.data.result_code === '200'){
@@ -473,7 +474,7 @@ class AddClass extends React.Component{
                                     <Button type="primary" className="f-r" htmlType="submit">
                                         确定
                                     </Button>
-                                    <Button type="primary" className="f-r m-r-20" onClick={this.changeCancel.bind(this)}>
+                                    <Button type="primary" className="f-r m-r-20" onClick={this.addCancel.bind(this)}>
                                         取消
                                     </Button>
                                 </Col>

@@ -86,38 +86,38 @@ class QueryStudent extends React.Component{
         this.setState({currentCourseId: data.a});
         //通过传递过来的course_id获取对应的学生列表
         let token1 = localStorage.getItem("token");
-        // URL.GetStuList(token1, data.a).then((res)=>{
-        //     if(res.data.result_code === '200'){
-        //         console.log("success get student list!");
-        //         const data = [];
-        //         for (let i = 0; i < res.data.data.length; i++) {
-        //
-        //             data.push({
-        //                 key: res.data.data[i].uid,
-        //                 stu_code:res.data.data[i].name,
-        //                 name:res.data.data[i].name,
-        //                 gender:res.data.data[i].gender,
-        //                 school:res.data.data[i].school,
-        //                 department:res.data.data[i].department,
-        //                 profession:res.data.data[i].profession,
-        //                 phone:res.data.data[i].phone,
-        //                 lack_count:res.data.data[i].lack_count
-        //             });
-        //         }
-        //         this.setState({data: data});
-        //     }
-        //     else if(res.data.result_code === '206'){
-        //         console.log("token time out!");
-        //         message.error("token time out!");
-        //     }else{
-        //         console.log(res.data);
-        //     }
-        // })
+        URL.GetStuList(token1, data.a).then((res)=>{
+            if(res.data.result_code === '200'){
+                console.log("success get student list!");
+                const data = [];
+                for (let i = 0; i < res.data.data.length; i++) {
+
+                    data.push({
+                        key: res.data.data[i].uid,
+                        stu_code:res.data.data[i].stu_code,
+                        name:res.data.data[i].name,
+                        gender:res.data.data[i].gender,
+                        school:res.data.data[i].school,
+                        department:res.data.data[i].department,
+                        profession:res.data.data[i].profession,
+                        phone:res.data.data[i].phone,
+                        lack_count:res.data.data[i].lack_count
+                    });
+                }
+                this.setState({data: data});
+            }
+            else if(res.data.result_code === '206'){
+                console.log("token time out!");
+                message.error("token time out!");
+            }else{
+                console.log(res.data);
+            }
+        })
     }
 
     //选择某一行
     onSelectChange(selectedRowKeys, selectedRows){
-        console.log('selectedRowKeys changed: ', selectedRowKeys);
+        console.log('selectedRowKeys changed: ', selectedRows);
         this.setState({ selectedRowKeys: selectedRowKeys, selectedRows:selectedRows });
     }
 
@@ -128,13 +128,14 @@ class QueryStudent extends React.Component{
             if(res.data.result_code === '200'){
                 console.log("success get student list!");
                 const data = [];
+                console.log(res.data)
                 for (let i = 0; i < res.data.data.length; i++) {
 
                     data.push({
                         key: res.data.data[i].id,
                         id:res.data.data[i].id,
                         uid:res.data.data[i].uid,
-                        stu_code:res.data.data[i].name,
+                        stu_code:res.data.data[i].stu_code,
                         name:res.data.data[i].name,
                         gender:res.data.data[i].gender,
                         school:res.data.data[i].school,
@@ -144,6 +145,7 @@ class QueryStudent extends React.Component{
                         lack_count:res.data.data[i].lack_count
                     });
                 }
+                //console.log(data)
                 this.setState({data: data});
             }
             else if(res.data.result_code === '206'){
@@ -248,7 +250,8 @@ class QueryStudent extends React.Component{
     //删除学生列表
     DelStuList(){
         let token1 = localStorage.getItem("token");
-        URL.DelStuinfo(token1, this.state.selectedRows[0].uid).then((res)=>{
+        console.log(token1);
+        URL.DelStuinfo(token1, this.state.selectedRows[0].key, this.state.currentCourseId).then((res)=>{
             if(res.data.result_code === '200'){
                 console.log("alter success!");
 
@@ -260,8 +263,8 @@ class QueryStudent extends React.Component{
         const columns = [
             {
                 title: '编号',
-                dataIndex: 'id',
-                key: 'id'
+                dataIndex: 'key',
+                key: 'key'
             },
             {
                 title: '学号',
@@ -336,7 +339,7 @@ class QueryStudent extends React.Component{
                             <Cascader options={options} onChange={this.handleCollegeChange.bind(this)}/>
                             <ButtonGroup className="f-r m-r-20">
                                 <Button type="primary" icon="plus" />
-                                <Button type="primary" icon="sync" />
+                                <Button type="primary" icon="sync" onClick={this.SyncOption.bind(this)}/>
                             </ButtonGroup>
                         </Col>
                         {/*<Col span={24}>*/}

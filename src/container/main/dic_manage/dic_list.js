@@ -1,5 +1,5 @@
 import React from 'react'
-import { Card,Icon,Layout,Row,Col,Tree,Form,Input,Button } from 'antd';
+import { Card,Icon,Layout,Row,Col,Tree,Form,Input,Button, TreeSelect } from 'antd';
 import { Link  } from 'react-router-dom';
 import { connect } from 'react-redux'
 import BreadcrumbCustom from '../../../component/BreadcrumbCustom'
@@ -14,42 +14,63 @@ const { TreeNode } = Tree;
 
 let infodata = [
     {
+        title: "福州大学",
+        value: '1',
+        key: '1',
         id:1,
         typeid:1,
         type_level:1,
         type_belong:0,
         info:"福州大学",
     },{
+        title: "厦门大学",
+        value: '2',
+        key: '2',
         id:2,
         typeid:1,  //大类别的id
         type_level:1,
         type_belong:0, // 类别从属的父id
         info: "厦门大学",
     },{
+        title: "其他大学",
+        value: '3',
+        key: '3',
         id:3,
         typeid:1,  //大类别id
         type_level:1,
         type_belong:0, // 类别从属的父id
         info: "其他大学",
     },{
+        title: "福大数计学院",
+        value: '11',
+        key: '11',
         id:11,
-        typeid:1,  //大类别id
-        type_level:2,
+        typeid:11,  //大类别id
+        type_level:11,
         type_belong:1, // 类别从属的父id
         info: "福大数计学院",
     },{
+        title: "福大经管学院",
+        value: '12',
+        key: '12',
         id:12,
         typeid:1,  //大类别id
         type_level:2,
         type_belong:1, // 类别从属的父id
         info: "福大经管学院",
     },{
+        title: "厦大数计学院",
+        value: '21',
+        key: '21',
         id:21,
         typeid:1,  //大类别id
         type_level:2,
         type_belong:2, // 类别从属的父id
         info: "厦大数计学院",
     },{
+        title: "厦大金融学院",
+        value: '22',
+        key: '22',
         id:22,
         typeid:1,  //大类别id
         type_level:2,
@@ -58,8 +79,8 @@ let infodata = [
     }];
 
 function buildTree(list){
-    let temp = {};
-    let tree = {};
+    let temp = [];
+    let tree = [];
     for(let i in list){
         temp[list[i].id] = list[i];
     }
@@ -76,6 +97,28 @@ function buildTree(list){
     return tree;
 }
 
+function listToTree(data) {
+    let arr = JSON.parse(JSON.stringify(data))
+    const listChildren = (obj, filter) => {
+        [arr, obj.children] = arr.reduce((res, val) => {
+            if (filter(val))
+                res[1].push(val)
+            else
+                res[0].push(val)
+            return res
+        }, [[],[]])
+        obj.children.forEach(val => {
+            if (arr.length)
+                listChildren(val, obj => obj.type_belong === val.id)
+        })
+    }
+
+    const tree = {}
+    listChildren(tree, val => arr.findIndex(i => i.id === val.type_belong) === -1)
+    return tree.children
+}
+
+
 class DicList extends React.Component{
     constructor(){
         super();
@@ -84,7 +127,8 @@ class DicList extends React.Component{
             selectedSchool: '',  //选中的学校
             selectedSchoolId: '',  //选中学校的id
             selectedInstitute: '',  //选中的学院
-            selectedInstituteId: ''  //选中学院的id
+            selectedInstituteId: '',  //选中学院的id
+            treedata: []
         };
         console.log(localStorage.getItem("token"));
     }
@@ -94,7 +138,8 @@ class DicList extends React.Component{
         //this.state.selectedInstitute = info.node.props.title;
         console.log(info.halfCheckedKeys);
         console.log('selected',selectedKeys, info);  //输出选中的key和对应的类名字
-        console.log(buildTree(infodata));
+        this.setState({treedata: listToTree(infodata)});
+        console.log(listToTree(infodata));
     }
 
     //获得所有大类
@@ -121,6 +166,13 @@ class DicList extends React.Component{
     //选择学校
     selectSchool(schoolName){
         this.setState({selectedSchool:schoolName});
+    }
+    onSelect(value, label, data){
+        //console.log(value);
+        console.log(data.node.props);
+    }
+    onChange(value){
+        console.log(value);
     }
 
     render(){
@@ -203,10 +255,18 @@ class DicList extends React.Component{
                                     </FormItem>
                                     <FormItem {...formItemLayout} label="类别从属">
                                         {getFieldDecorator('type_belong', {
-                                            initialValue: this.state.selectedSchool,
-                                            rules: [{ required: true, message: '类别从属不能为空!' }],
+
                                         })(
-                                            <Input />
+                                            <TreeSelect
+                                                style={{ width: 250 }}
+                                                dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+                                                treeData={this.state.treedata}
+                                                placeholder="Please select"
+                                                allowClear
+                                                treeDefaultExpandAll
+                                                onSelect={this.onSelect}
+                                                onChange={this.onChange}
+                                            />
                                         )}
                                     </FormItem>
                                     <Row type="flex" justify="space-around">

@@ -98,13 +98,14 @@ export function GetStuList(token, course_id){
 export const get_student = 'http://167.179.75.22:16666/api/course/students';
 
 //添加学生到课程
-export function AddStuToCourse(token, stu_code, email, phone) {
+export function AddStuToCourse(token, stu_code, email, phone, course_id) {
     const add_stu_to_course = baseURL+'/api/course/stu2course';
     var fd = new FormData();
     fd.append('token', token);
     fd.append('stu_code', stu_code);
     fd.append('email', email);
     fd.append('phone', phone);
+    fd.append('course_id', course_id);
     return new Promise((resolve, reject)=>{
         axios.post(add_stu_to_course, fd, {headers: {"Content-Type": "multipart/form-data"}}
         ).then((res)=>{
@@ -149,17 +150,21 @@ export function DelStuinfo(token, uid, course_id) {
     fd.append('token', token);
     fd.append('uid', uid);
     fd.append('course_id', course_id);
-    axios.delete(del_stu_info, {params:fd, headers: {"Content-Type": "multipart/form-data"}}
-    ).then((res)=>{
-        //console.log(res.data);
-        if(res.data.result_code ==='200'){
-            message.success("删除成功");
-        }else{
-            console.log(res.data);
-            message.error("删除失败");
-        }
-        resolve(res)
+    console.log(uid);
+    return new Promise((resolve, reject)=>{
+        axios.delete(del_stu_info, {data:fd, headers: {"Content-Type": "multipart/form-data"}}
+        ).then((res)=>{
+            //console.log(res.data);
+            if(res.data.result_code ==='200'){
+                message.success("删除成功");
+            }else{
+                console.log(res.data);
+                message.error("删除失败");
+            }
+            resolve(res)
+        })
     })
+
 }
 
 //得到签到列表
@@ -207,7 +212,7 @@ export function DelSignList(token, id) {
     fd.append('token', token);
     fd.append('id', id);
     return new Promise((resolve, reject)=>{
-        axios.delete(del_sign_list, {params:fd, headers: {"Content-Type": "multipart/form-data"}}
+        axios.delete(del_sign_list, {data:fd, headers: {"Content-Type": "multipart/form-data"}}
         ).then((res)=>{
             //console.log(res.data);
             if(res.data.result_code ==='200'){
@@ -462,7 +467,7 @@ export function DelType(token, typeid) {
     fd.append('token', token);
     fd.append('typeid', typeid);
     return new Promise((resolve, reject)=>{
-        axios.delete(del_type, {params:fd, headers: {"Content-Type": "multipart/form-data"}}
+        axios.delete(del_type, {data:fd, headers: {"Content-Type": "multipart/form-data"}}
         ).then((res)=>{
             //console.log(res.data);
             if(res.data.result_code ==='200'){
@@ -490,7 +495,7 @@ export function DelTypeInfo(token, infoid) {
     fd.append('token', token);
     fd.append('infoid', infoid);
     return new Promise((resolve, reject)=>{
-        axios.delete(del_type_info, {params:fd, headers: {"Content-Type": "multipart/form-data"}}
+        axios.delete(del_type_info, {data:fd, headers: {"Content-Type": "multipart/form-data"}}
         ).then((res)=>{
             //console.log(res.data);
             if(res.data.result_code ==='200'){
@@ -571,9 +576,15 @@ export function AlterInfos(token, type_level, infoid, type_belong, info) {
 }
 export const change_type_info = 'http://167.179.75.22:16666/api/dict/info';
 
-//通过typename获得字典内容
+//通过typename获得父类的所有子类的字典内容
 export function GetInfoByName(typename){
     const get_types_by_name = baseURL+ '/api/dict/infos4name';
+    return new Promise((resolve, reject)=>{
+        axios.get(get_types_by_name, {params: {typename: typename},
+            headers: {"Content-Type": "application/json; charset=UTF-8"}}).then((res)=>{
+            resolve(res)
+        })
+    })
 }
 //获得角色信息
 
