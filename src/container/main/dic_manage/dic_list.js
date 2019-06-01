@@ -169,7 +169,7 @@ class DicList extends React.Component{
     }
     onSelect(value, label, data){
         //console.log(value);
-        console.log(data.node.props);
+        console.log(data);
     }
     onChange(value){
         console.log(value);

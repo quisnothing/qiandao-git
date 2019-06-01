@@ -414,6 +414,7 @@ export function CreateInfo(token, typeid, type_level, type_belong, info) {
                 message.success("创建成功");
             }else{
                 console.log(res.data)
+                console.log(fd);
                 message.error("创建失败");
             }
             //console.log(res.data);

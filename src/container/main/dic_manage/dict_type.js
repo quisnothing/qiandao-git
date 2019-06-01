@@ -1,5 +1,5 @@
 import React from 'react'
-import { Card,Icon,Layout,Row,Col,Tree,Form,Input,Button,Select,Modal } from 'antd';
+import { Card,Icon,Layout,Row,Col,Tree,Form,Input,Button,Select,Modal, TreeSelect } from 'antd';
 import { Link  } from 'react-router-dom';
 import { connect } from 'react-redux'
 import BreadcrumbCustom from '../../../component/BreadcrumbCustom'
@@ -26,24 +26,35 @@ function FilterObj(item, keys){
         })
     }
 }
-//将原始数据整合成树结构
-function buildTree(list){
-    let temp = {};
-    let tree = {};
-    for(let i in list){
-        temp[list[i].id] = list[i];
-    }
-    for(let i in temp){
-        if(temp[i].type_belong) {
-            if(!temp[temp[i].type_belong].children) {
-                temp[temp[i].type_belong].children = new Object();
-            }
-            temp[temp[i].type_belong].children[temp[i].id] = temp[i];
-        } else {
-            tree[temp[i].id] =  temp[i];
+//矫正原始数据，确保level1的belong是自己的id
+function RebuildData(list){
+    for (let i = 0; i < list.length; i++){
+        if(list[i].type_level === 1){
+            list[i].type_belong = 0;
         }
     }
-    return tree;
+    return list;
+}
+
+function listToTree(data) {
+    let arr = JSON.parse(JSON.stringify(data))
+    const listChildren = (obj, filter) => {
+        [arr, obj.children] = arr.reduce((res, val) => {
+            if (filter(val))
+                res[1].push(val)
+            else
+                res[0].push(val)
+            return res
+        }, [[],[]])
+        obj.children.forEach(val => {
+            if (arr.length)
+                listChildren(val, obj => obj.type_belong === val.id)
+        })
+    }
+
+    const tree = {}
+    listChildren(tree, val => arr.findIndex(i => i.id === val.type_belong) === -1)
+    return tree.children
 }
 
 class DictType extends React.Component{
@@ -57,17 +68,45 @@ class DictType extends React.Component{
             ModalTypeId: '', //Modal框的选择框
             typedata: [],
             treeData: [
-                {info: '福州大学', id: 0, key: 'fzu'},
-                {info: '厦门大学', id: 1, key: 'Xmu'},
-                {info: '其他大学', id: 2, key: 'oru', children:[
-                    {info: '其他学院', id: 3, key: 'ort'}
+                {   title: "福州大学",
+                    value: '1',
+                    key: '1',
+                    id:1,
+                    typeid:1,
+                    type_level:1,
+                    type_belong:0,
+                    info:"福州大学"},
+                {   title: "厦门大学",
+                    value: '2',
+                    key: '2',
+                    id:2,
+                    typeid:1,  //大类别的id
+                    type_level:1,
+                    type_belong:0, // 类别从属的父id
+                    info: "厦门大学"},
+                {title: "其他大学",
+                    value: '3',
+                    key: '3',
+                    id:3,
+                    typeid:1,  //大类别id
+                    type_level:1,
+                    type_belong:0, // 类别从属的父id
+                    info: "其他大学", children:[
+                    {title: "某数计学院",
+                        value: '11',
+                        key: '11',
+                        id:11,
+                        typeid:11,  //大类别id
+                        type_level:2,
+                        type_belong:3, // 类别从属的父id
+                        info: "某数计学院"}
                 ]},
             ],
 
             visibleOptionModal: false, //大类修改新增删除框是否显示
-            ref_old_info: '',
-            ref_new_info: '',
-            ref_belong: '',
+            ref_old_type_level: '1', //操作框的旧类别类别级别
+            ref_new_info: '',  //操作框的新类别名称
+            ref_belong: '0',   //操作框的类别的父类别id
         };
     }
     handleSelect(value){
@@ -97,10 +136,10 @@ class DictType extends React.Component{
                             info: res.data.data[i].info
                         });
                     }
-
-                    let t_tree = buildTree(data);
+                    let temp_data = RebuildData(data);
+                    let t_tree = listToTree(temp_data);
                     console.log(t_tree);
-                    //this.setState({treeData: t_tree});
+                    this.setState({treeData: t_tree});
                 }
                 else{
                     console.log("fail!");
@@ -115,6 +154,39 @@ class DictType extends React.Component{
         console.log(value)
         this.setState({ModalTypeId: value});
     }
+    //更新数据
+    SyncOption(){
+        let temp_token = localStorage.getItem("token");
+        let temp_value = this.state.selectedTypeId;
+        URL.GetTypeChild(temp_token, temp_value).then((res)=>{
+            if(res.data.result_code === '200'){
+                console.log("success get type!");
+
+                const data = []; //添加title,value,key
+                for (let i = 0; i < res.data.data.length; i++) {
+
+                    data.push({
+                        title: res.data.data[i].info,
+                        value: res.data.data[i].id,
+                        key: res.data.data[i].id,
+                        id:res.data.data[i].id,
+                        typeid: res.data.data[i].typeid,
+                        type_level : res.data.data[i].type_level,
+                        type_belong: res.data.data[i].type_belong,
+                        info: res.data.data[i].info
+                    });
+                }
+                let temp_data = RebuildData(data);
+                let t_tree = listToTree(temp_data);
+                console.log(t_tree);
+                this.setState({treeData: t_tree});
+            }
+            else{
+                console.log("fail!");
+                console.log(res);
+            }
+        })
+    }
 
     //点击树节点进行具体类别选择
     SelectTreeNode(selectedKeys, info){
@@ -125,13 +197,13 @@ class DictType extends React.Component{
             FilterObj(item, 'fzu-0');
             console.log(result);
         });
-        this.setState({selectedInfoId: selectedKeys});
+        //this.setState({selectedInfoId: selectedKeys});
         console.log('selected',selectedKeys, info);
     }
 
     componentWillMount(){
         //渲染前先取得所有大类信息
-        var temp_tops = localStorage.getItem("Toptypes");
+        var temp_tops = JSON.parse(localStorage.getItem("Toptypes"));
         if(this.state.typedata !== temp_tops){
             var temp_token = localStorage.getItem("token");
             URL.GetAllTypes(temp_token).then((res)=>{
@@ -176,86 +248,97 @@ class DictType extends React.Component{
         return data.map((item) => {
             if (item.children) {
                 return (
-                    <TreeNode title={item.info} key={item.key} dataRef={item}>
+                    <TreeNode title={item.title} key={String(item.key)} dataRef={item}>
                         {this.renderTreeNodes(item.children)}
                     </TreeNode>
                 );
             }
-            return <TreeNode title={item.info} key={item.key} dataRef={item} />;
+            return <TreeNode title={item.title} key={String(item.key)} dataRef={item} />;
         })
     }
-    //保存类别旧称输入框的数据
-    handleOldTypeChange(e){
-        this.setState({ref_old_info: e.target.value}, function () {
-            console.log(this.state.ref_old_info)
-        });
+    //保存类别旧称选择框的数据
+    handleOldTypeChange(value){
+        console.log('change'+value);
+        if(value === undefined){
+            this.setState({selectedInfoId: ''});
+        }
     }
+    handleOldTypeSelect(value, label, data){
+        console.log(data.node.props);
+        if(value !== undefined){
+            this.setState({selectedInfoId: data.node.props.id});
+        }
+
+    }
+
     //保存类别新称输入框的数据
     handleNewTypeChange(e){
         this.setState({ref_new_info: e.target.value}, function () {
             console.log(this.state.ref_new_info)
         });
     }
-    //保存类别从属输入框的数据
-    handleTypeBelongChange(e){
-        this.setState({ref_belong: e.target.value}, function () {
-            console.log(this.state.ref_belong)
-        });
+
+    //保存类别从属选择框的数据
+    handleTypeBelongChange(value){
+        console.log(value);
+        if(value === undefined){
+            this.setState({ref_belong: '0', ref_old_type_level: '1'});
+        }
+    }
+    handleTypeBelongSelect(value, label, data){
+        console.log(data.node.props);
+        if (value !== undefined){
+            let type_level1 = String(+(data.node.props.type_level)+1);
+            console.log(type_level1)
+            this.setState({ref_belong: data.node.props.id, ref_old_type_level: type_level1});
+        }
     }
 
     //修改具体类别信息
     AlterInfo(){
         //console.log(this.state.ref_old_info.props.value);
-        const newinfo = this.state.ref_new_info;
-        //从result中取出要修改的info记录
-        // let token = localStorage.getItem("token");
-        // let type_level = result[0].type_level;
-        // let infoid = result[0].id;
-        // let type_belong = result[0].type_belong;
-        // URL.AlterInfos(token, type_level, infoid, type_belong, newinfo).then((res)=>{
-        //     if(res.data.result_code === '200'){
-        //         console.log("success register!");
-        //         message.success('Processing complete!')
-        //     }
-        // })
+        let newinfo = this.state.ref_new_info;
+        let token = localStorage.getItem("token");
+        let type_level = this.state.ref_old_type_level;
+        let infoid = this.state.selectedInfoId;
+        let type_belong = this.state.ref_belong;
+        URL.AlterInfos(token, type_level, infoid, type_belong, newinfo).then((res)=>{
+            if(res.data.result_code === '200'){
+                console.log("success alter!");
+                this.SyncOption()
+            }
+        })
     }
 
     //创建具体类别信息
     CreateInfos(){
         //点击左侧树拿到父节点的全部信息后,type_level+1
         let token = localStorage.getItem("token");
-        URL.GetInfoByName(this.state.ref_belong).then((res)=>{
-            let type_level = String(+(res.data.data[0].type_level)+1);
-            let type_belong = res.data.data[0].typeid;
-            let typeid = this.state.selectedTypeId;
-            let newinfo = this.state.ref_new_info;
-            URL.CreateInfo(token, typeid, type_level, type_belong, newinfo).then((res)=>{
-                if(res.data.result_code === '200'){
-                    console.log("success create!");
-                    //message.success('Processing complete!')
-                }
-            })
-        });
-        // let type_level = result[0].type_level;
-        // type_level = String((+type_level)+ 1);
-        // let typeid = result[0].typeid;
-        // let type_belong = result[0].type_belong;
-        // let newinfo = this.state.ref_new_info;
-        // URL.CreateInfo(token, typeid, type_level, type_belong, newinfo).then((res)=>{
-        //     if(res.data.result_code === '200'){
-        //         console.log("success create!");
-        //         //message.success('Processing complete!')
-        //     }
-        // })
+        let type_level = this.state.ref_old_type_level;
+        let typeid = this.state.selectedTypeId;  //大类别id
+        let type_belong = this.state.ref_belong;
+        if(type_level === '1'){
+            //如果创建的是level1的类别，那么belong写0，type_level=1
+            type_belong = '0';
+            type_level = '1';
+        }
+        let newinfo = this.state.ref_new_info;
+        URL.CreateInfo(token, typeid, type_level, type_belong, newinfo).then((res)=>{
+            if(res.data.result_code === '200'){
+                console.log("success create!");
+                this.SyncOption()
+            }
+        })
     }
 
     //删除具体类别
     DeleteInfos(){
         let token = localStorage.getItem("token");
-        let infoid = result[0].id;
+        let infoid = this.state.selectedInfoId;
         URL.DelTypeInfo(token, infoid).then((res)=>{
             if(res.data.result_code === '200'){
                 console.log("success delete!");
+                this.SyncOption()
                 //message.success('Processing complete!')
             }
         })
@@ -357,7 +440,17 @@ class DictType extends React.Component{
                                         {getFieldDecorator('type_old_name', {
 
                                         })(
-                                            <Input onChange={this.handleOldTypeChange.bind(this)} />
+
+                                            <TreeSelect
+                                                style={{ width: 230 }}
+                                                dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+                                                treeData={this.state.treeData}
+                                                placeholder="Please select"
+                                                allowClear
+                                                treeDefaultExpandAll
+                                                onSelect={this.handleOldTypeSelect.bind(this)}
+                                                onChange={this.handleOldTypeChange.bind(this)}
+                                            />
                                         )}
                                     </FormItem>
                                     <FormItem {...formItemLayout} label="类别新称">
@@ -371,9 +464,17 @@ class DictType extends React.Component{
                                     <FormItem {...formItemLayout} label="类别从属">
                                         {getFieldDecorator('type_belong', {
 
-                                            rules: [{ required: true, message: '类别从属不能为空!' }],
                                         })(
-                                            <Input onChange={this.handleTypeBelongChange.bind(this)} />
+                                            <TreeSelect
+                                                style={{ width: 230 }}
+                                                dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+                                                treeData={this.state.treeData}
+                                                placeholder="Please select"
+                                                allowClear
+                                                treeDefaultExpandAll
+                                                onSelect={this.handleTypeBelongSelect.bind(this)}
+                                                onChange={this.handleTypeBelongChange.bind(this)}
+                                            />
                                         )}
                                     </FormItem>
                                     <Row type="flex" justify="center">
@@ -381,10 +482,10 @@ class DictType extends React.Component{
                                             <Button type="primary" ghost onClick={this.AlterInfo.bind(this)}>修改</Button>
                                         </Col>
                                         <Col>
-                                            <Button type="primary" ghost>新增</Button>
+                                            <Button type="primary" ghost onClick={this.CreateInfos.bind(this)}>新增</Button>
                                         </Col>
                                         <Col>
-                                            <Button type="danger" ghost>删除</Button>
+                                            <Button type="danger" ghost onClick={this.DeleteInfos.bind(this)}>删除</Button>
                                         </Col>
                                     </Row>
                                 </Form>
