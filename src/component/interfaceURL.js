@@ -82,6 +82,33 @@ export function ForgotPass(token, email, email_code, old_pwd, new_pwd) {
     })
 }
 
+//修改用户信息
+export function AlterUserInfo(token, uid, nick, phone, gender, stu_code, school, insti, depart) {
+    const alter_user_info = baseURL + '/api/user/info';
+    var fd = new FormData();
+    fd.append('token', token);
+    fd.append('uid', uid);
+    fd.append('nick_name', nick);
+    fd.append('phone', phone);
+    fd.append('gender', gender);
+    fd.append('stu_code', stu_code);
+    fd.append('school', school);
+    fd.append('department', insti);
+    fd.append('profession', depart);
+    return new Promise((resolve, reject)=>{
+        axios.put(alter_user_info, fd, {headers: {"Content-Type": "multipart/form-data"}}
+        ).then((res)=>{
+            if(res.data.result_code ==='200'){
+                message.success("修改成功");
+            }else{
+                console.log(res.data)
+                message.error("修改失败");
+            }
+            resolve(res)
+        })
+    })
+}
+
 //得到学生列表
 export function GetStuList(token, course_id){
     const getStu = baseURL+'/api/course/students';

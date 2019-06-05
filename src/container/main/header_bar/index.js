@@ -52,7 +52,7 @@ class HeaderBar extends React.Component{
             >
                 <SubMenu title={<span><Icon type="user" />{this.props.userinfo.userName}</span>}>
                     <Menu.Item key="sign_out"><Link to="/login">退出</Link></Menu.Item>
-                    <Menu.Item key="change_password"><Link to="/main/personal_center/change_password">修改密码</Link></Menu.Item>
+                    {/*<Menu.Item key="change_password"><Link to="/main/personal_center/change_password">修改密码</Link></Menu.Item>*/}
                     <Menu.Item key="change_information"><Link to="/main/personal_center/change_information">修改信息</Link></Menu.Item>
                 </SubMenu>
             </Menu>

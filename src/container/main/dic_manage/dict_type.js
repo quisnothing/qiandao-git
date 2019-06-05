@@ -412,10 +412,10 @@ class DictType extends React.Component{
                             <Form>
                                 <FormItem {...formItemLayout} label="字典大类">
                                     <Select style={{ width: 120 }} onChange={this.handleSelect.bind(this)}>
-                                        {TopTypes}
-                                        <Option value="lucy">其他信息</Option>
+                                    {TopTypes}
+                                    <Option value="lucy">其他信息</Option>
 
-                                    </Select>
+                                </Select>
                                 </FormItem>
                             </Form>
 

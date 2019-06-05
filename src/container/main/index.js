@@ -120,17 +120,24 @@ class Main extends React.Component{
                                {/*<Menu.Item key="call_signin"><Link to="/main/signin_manage/call_signin">发起签到</Link></Menu.Item>*/}
                                {/*<Menu.Item key="query_sign"><Link to="/main/signin_manage/querySign">签到管理</Link></Menu.Item>*/}
                            {/*</SubMenu>*/}
-                           <SubMenu key="student_manage" title={<span><Icon type="usergroup-add" /><span>学生管理</span></span>}>
-                               <Menu.Item key="add_student"><Link to="/main/student_manage/add_student">添加学生到课程</Link></Menu.Item>
-                               <Menu.Item key="query_student"><Link to="/main/student_manage/query_student">查询学生</Link></Menu.Item>
-                           </SubMenu>
                            {
-                               this.state.roleSet == 1 ? <SubMenu key="teacher_manage" title={<span><Icon type="user-add" /><span>教师管理</span></span>}>
-                                       <Menu.Item key="add_teacher"><Link to="/main/teacher_manage/add_teacher">添加教师</Link></Menu.Item>
-                                       <Menu.Item key="query_teacher"><Link to="/main/teacher_manage/query_teacher">查询教师</Link></Menu.Item>
-                                   </SubMenu> :
+                               this.state.roleSet == 1 ? <SubMenu key="student_manage" title={<span><Icon type="usergroup-add" /><span>学生管理</span></span>}>
+                                   <Menu.Item key="add_student"><Link to="/main/student_manage/add_student">添加学生到课程</Link></Menu.Item>
+                                   {/*<Menu.Item key="query_student"><Link to="/main/student_manage/query_student">查询学生</Link></Menu.Item>*/}
+                               </SubMenu> :
                                    ''
                            }
+                           {/*<SubMenu key="student_manage" title={<span><Icon type="usergroup-add" /><span>学生管理</span></span>}>*/}
+                               {/*<Menu.Item key="add_student"><Link to="/main/student_manage/add_student">添加学生到课程</Link></Menu.Item>*/}
+                               {/*/!*<Menu.Item key="query_student"><Link to="/main/student_manage/query_student">查询学生</Link></Menu.Item>*!/*/}
+                           {/*</SubMenu>*/}
+                           {/*{*/}
+                               {/*this.state.roleSet == 1 ? <SubMenu key="teacher_manage" title={<span><Icon type="user-add" /><span>教师管理</span></span>}>*/}
+                                       {/*<Menu.Item key="add_teacher"><Link to="/main/teacher_manage/add_teacher">添加教师</Link></Menu.Item>*/}
+                                       {/*<Menu.Item key="query_teacher"><Link to="/main/teacher_manage/query_teacher">查询教师</Link></Menu.Item>*/}
+                                   {/*</SubMenu> :*/}
+                                   {/*''*/}
+                           {/*}*/}
 
                            {
                                this.state.roleSet == 1 ? <SubMenu key="dic_manage" title={<span><Icon type="user" /><span>组织管理</span></span>}>
