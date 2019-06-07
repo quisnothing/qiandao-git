@@ -113,6 +113,11 @@ class QuerySignIn extends React.Component{
     changeOK(){
         this.props.form.validateFieldsAndScroll((err,values)=>{
             if(!err){
+                const role = localStorage.getItem("type");
+                if(role !== 1){ //只有管理员才能增、删、改
+                    message.error("权限不足！");
+                    return;
+                }
                 let token1 = localStorage.getItem("token");
                 URL.AlterSignList(token1, this.state.curSelectRecord.id, values.remarks,
                     this.state.selectedRows[0].distance).then((res)=>{
@@ -127,6 +132,11 @@ class QuerySignIn extends React.Component{
     }
 
     deleteOk(){
+        const role = localStorage.getItem("type");
+        if(role !== 1){ //只有管理员才能增、删、改
+            message.error("权限不足！");
+            return;
+        }
         let token1 = localStorage.getItem("token");
         URL.DelSignList(token1, this.state.selectedRows.id).then((res)=>{
             if(res.data.result_code === '200'){

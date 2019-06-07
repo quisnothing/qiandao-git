@@ -12,6 +12,23 @@ const Search = Input.Search;
 const FormItem = Form.Item;
 const confirm = Modal.confirm;
 
+let classData = [{
+    course_id: '1',
+    course_name: '计算机工程',
+    teacher: '池老标',
+    time: '2019.6'
+    },{
+    course_id: '2',
+    course_name: '数值分析',
+    teacher: '陈某某',
+    time: '2018.6'
+    },{
+    course_id: '3',
+    course_name: '高级机器学习',
+    teacher: '张某某',
+    time: '2018.10'
+    }]
+
 class QueryClass extends React.Component{
     constructor(){
         super();
@@ -116,16 +133,16 @@ class QueryClass extends React.Component{
         this.searchKey = value;
     }
 
-    //点击所有班级
+    //点击显示所有班级
     showAllClass(){
         this.turnStatus = "NORMAL";
         this.state.pagination.current = 1;//当前页置为第一页
         this.getPageDate();
     }
 
-    //点击搜索
+    //输入搜索内容点击搜索,内容必须是课程名
     searchClass(value) {
-        if(value == "") {
+        if(value === "") {
             Modal.error({
                 content: "搜索内容不能为空！",
                 okText : '确定'
@@ -136,7 +153,14 @@ class QueryClass extends React.Component{
         this.state.pagination.current = 1;//当前页置为第一页
         this.setState({pagination : this.state.pagination});
         this.searchContent = value;
-        this.getSearchData();
+        var search_result = [];
+        var j = 0;
+        for (let i =0;i<classData.length;i++){
+            if(classData[i].course_name.indexOf(value) !== -1){
+                search_result[j++] = classData[i]
+            }
+        }
+        console.log(search_result)
     }
 
     //选择某一行
@@ -238,7 +262,7 @@ class QueryClass extends React.Component{
                             />
                             <Select className="f-r m-r-20" defaultValue="1" style={{ width: 120 }} onChange={this.handleChange.bind(this)}>
                                 <Option value="1">课程</Option>
-                                <Option value="2">签到状态</Option>
+                                {/*<Option value="2">签到状态</Option>*/}
                             </Select>
                             <Button type="primary" className="f-l" onClick={this.showAllClass.bind(this)}>所有课程</Button>
                         </Col>

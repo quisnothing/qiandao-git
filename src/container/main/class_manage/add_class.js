@@ -115,6 +115,7 @@ class AddClass extends React.Component{
                 localStorage.setItem("subjects", JSON.stringify(data));
             }else{
                 console.log("fail get!");
+                console.log(res.data)
             }
         })
     }
@@ -174,8 +175,25 @@ class AddClass extends React.Component{
     changeCancel(){  //关闭修改页面
         this.setState({visibleChangeModal:false});
     }
-    syncClass(){  //刷新课程
-
+    searchClass(value){  //搜索课程
+        if(value === "") {
+            Modal.error({
+                content: "搜索内容不能为空！",
+                okText : '确定'
+            });
+            return;
+        }
+        var new_array = [];
+        var j = 0;
+        for(let i=0; i<this.state.data.length;i++){
+            if(this.state.data[i].course_name.indexOf(value) !== -1){
+                new_array[j++] = this.state.data[i];
+            }
+        }
+        //保存
+        this.setState({data: new_array}, function () {
+            console.log("search finished!")
+        })
     }
     deleteClass(){  //删除课程
         message.success("暂时没开放此功能！");
@@ -183,6 +201,11 @@ class AddClass extends React.Component{
     changeOk(){  //点击确定，完成修改
         this.props.form.validateFieldsAndScroll((err, values)=>{
             if(!err){
+                const role = localStorage.getItem("type");
+                if(role !== 1){ //只有管理员才能增、删、改
+                    message.error("权限不足！");
+                    return;
+                }
                 let token1 = localStorage.getItem("token");
                 let course_id1 = this.state.currentSelectClass.course_id;
                 let course_name1 = values.name;
@@ -206,6 +229,11 @@ class AddClass extends React.Component{
     AddOk(){  //点击确定， 完成添加
         this.props.form.validateFieldsAndScroll((err, values)=>{
             if(!err){
+                const role = localStorage.getItem("type");
+                if(role !== 1){ //只有管理员才能增、删、改
+                    message.error("权限不足！");
+                    return;
+                }
                 let token = localStorage.getItem("token");
                 let uid = localStorage.getItem("uid");
                 console.log(token);
@@ -321,22 +349,22 @@ class AddClass extends React.Component{
                 <div className="class-manage-content">
                     <Row>
                         <Col span={24}>
-                            {/*<Search*/}
-                                {/*className="f-r"*/}
-                                {/*palceholder="请输入关键字"*/}
-                                {/*onSearch={this.searchClass.bind(this)}*/}
-                                {/*enterButton*/}
-                                {/*style={{width:200}}*/}
-                            {/*/>*/}
-                            {/*<Select className="f-r m-r-20" defaultValue="1" style={{ width: 120 }} onChange={this.handleChange.bind(this)}>*/}
-                                {/*<Option value="1">课程</Option>*/}
+                            <Search
+                                className="f-r"
+                                palceholder="请输入关键字"
+                                onSearch={this.searchClass.bind(this)}
+                                enterButton
+                                style={{width:200}}
+                            />
+                            <Select className="f-r m-r-20" defaultValue="1" style={{ width: 120 }} >
+                                <Option value="1">课程</Option>
                                 {/*<Option value="2">代码</Option>*/}
-                            {/*</Select>*/}
-                            <ButtonGroup className="f-r m-r-20">
+                            </Select>
+                            <ButtonGroup className="f-l">
                                 <Button type="primary" icon="plus"  onClick={this.addClass.bind(this)}/>
                                 <Button type="primary" icon="sync" onClick={this.getCourseList.bind(this)}/>
                             </ButtonGroup>
-                            <Button type="primary" className="f-l" onClick={this.getCourseList.bind(this)}>全部课程</Button>
+                            {/*<Button type="primary" className="f-l" onClick={this.getCourseList.bind(this)}>全部课程</Button>*/}
                         </Col>
                     </Row>
                     <div className="m-t-20">
@@ -348,6 +376,7 @@ class AddClass extends React.Component{
                             lacale={localObj}
                             onChange={this.handleTableChange.bind(this)}
                         />
+                        <div>*勾选课程后，可以通过点击查看课程详情、对应的签到情况和学生情况</div>
                     </div>
                     <Modal
                         title="修改课程"

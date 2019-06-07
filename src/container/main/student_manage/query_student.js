@@ -199,7 +199,7 @@ class QueryStudent extends React.Component{
     }
 
     //点击搜索
-    searchContent(value) {
+    SearchContent(value) {
         if(value === ""){
             Modal.error({
                 content: "搜索内容不能为空！",
@@ -224,6 +224,11 @@ class QueryStudent extends React.Component{
         //this.setState({visibleChangeModal:false});
         this.props.form.validateFieldsAndScroll((err,values)=>{
             if(!err){
+                const role = localStorage.getItem("type");
+                if(role !== 1){ //只有管理员才能增、删、改
+                    message.error("权限不足！");
+                    return;
+                }
                 let token1 = localStorage.getItem("token");
                 URL.AlterStuInfo(token1, this.state.curSelectClass.id, values.lack_count).then((res)=>{
                     if(res.data.result_code === '200'){
@@ -249,6 +254,11 @@ class QueryStudent extends React.Component{
     }
     //删除学生列表
     DelStuList(){
+        const role = localStorage.getItem("type");
+        if(role !== 1){ //只有管理员才能增、删、改
+            message.error("权限不足！");
+            return;
+        }
         let token1 = localStorage.getItem("token");
         console.log(token1);
         URL.DelStuinfo(token1, this.state.selectedRows[0].key, this.state.currentCourseId).then((res)=>{
@@ -335,8 +345,8 @@ class QueryStudent extends React.Component{
                 <div className="query-student-content">
                     <Row>
                         <Col span={24}>
-                            <Button type="primary" className="f-l">查询</Button>
-                            <Cascader options={options} onChange={this.handleCollegeChange.bind(this)}/>
+                            {/*<Button type="primary" className="f-l">查询</Button>*/}
+                            {/*<Cascader options={options} onChange={this.handleCollegeChange.bind(this)}/>*/}
                             <ButtonGroup className="f-r m-r-20">
                                 <Button type="primary" icon="plus" />
                                 <Button type="primary" icon="sync" onClick={this.SyncOption.bind(this)}/>

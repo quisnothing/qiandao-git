@@ -113,8 +113,8 @@ class Main extends React.Component{
                              openKeys={this.state.openKeys} onOpenChange={this.onOpenChange.bind(this)} theme="dark">
                            <SubMenu key="class_manage" title={<span><Icon type="layout" /><span>课程管理</span></span>}>
                                <Menu.Item key="add_class"><Link to="/main/class_manage/add_class">课程信息</Link></Menu.Item>
-                               <Menu.Item key="query_class"><Link to="/main/class_manage/query_class">签到信息</Link></Menu.Item>
-                               <Menu.Item key="query_student"><Link to="/main/student_manage/query_student">学生信息</Link></Menu.Item>
+                               {/*<Menu.Item key="query_class"><Link to="/main/class_manage/query_class">签到信息</Link></Menu.Item>*/}
+                               {/*<Menu.Item key="query_student"><Link to="/main/student_manage/query_student">学生信息</Link></Menu.Item>*/}
                            </SubMenu>
                            {/*<SubMenu key="signin_manage" title={<span><Icon type="bulb" /><span>签到管理</span></span>}>*/}
                                {/*<Menu.Item key="call_signin"><Link to="/main/signin_manage/call_signin">发起签到</Link></Menu.Item>*/}
