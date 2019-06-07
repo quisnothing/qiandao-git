@@ -3,7 +3,7 @@ import { Form,Input,Select,Row,Col,Button,Modal } from 'antd';
 import { Link  } from 'react-router-dom';
 import * as URL from '../../../component/interfaceURL'
 import BreadcrumbCustom from '../../../component/BreadcrumbCustom'
-import {AlterUserInfo} from "@component/interfaceURL";
+import {AlterUserInfo} from '../../../component/interfaceURL';
 
 const FormItem = Form.Item;
 const Option = Select.Option;
@@ -87,7 +87,7 @@ class ChangeInformation extends React.Component{
                 var new_depart = values.Depart;
                 var token1 = localStorage.getItem("token");
                 var uid1 = localStorage.getItem("uid");
-                AlterUserInfo(token1,uid1,new_nick,new_phone,this.state.new_gender,
+                URL.AlterUserInfo(token1,uid1,new_nick,new_phone,this.state.new_gender,
                     new_stu_code,new_school,new_insti,new_depart).then((res)=>{
                     if(res.data.result_code === '200'){
                         console.log("success alter userinfo!");

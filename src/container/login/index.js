@@ -8,7 +8,7 @@ import * as userinfoActions from '../../actions/userinfo'
 import { axiosLogin } from './axios/index'
 import httpServer from '../../component/httpServer'
 import * as URL from '../../component/interfaceURL'
-import {hex_md5} from "@component/md5";
+import {hex_md5} from '../../component/md5';
 
 const FormItem = Form.Item;
 

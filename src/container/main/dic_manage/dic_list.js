@@ -6,7 +6,7 @@ import BreadcrumbCustom from '../../../component/BreadcrumbCustom'
 import * as URL from '../../../component/interfaceURL'
 import httpServer from '../../../component/httpServer'
 import http from '../../../component/axiosHttp'
-import {hex_md5} from "@component/md5";
+import {hex_md5} from '../../../component/md5';
 
 const { Header, Content, Footer } = Layout;
 const FormItem = Form.Item;
@@ -143,7 +143,7 @@ class DicList extends React.Component{
     }
 
     //获得所有大类
-    async getTopTypes(){
+    getTopTypes(){
         let temp_uid = localStorage.getItem("uid");
         let temp_token = localStorage.getItem("token");
         let temp_type = localStorage.getItem("type");

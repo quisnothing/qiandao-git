@@ -5,7 +5,7 @@ import * as URL from '../../component/interfaceURL'
 import httpServer from '../../component/httpServer'
 import BreadcrumbCustom from '../../component/BreadcrumbCustom'
 import { Link } from 'react-router-dom';
-import {hex_md5} from "@component/md5";
+import {hex_md5} from '../../component/md5';
 import background from '../../assets/images/background.png'
 
 const FormItem = Form.Item;

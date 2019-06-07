@@ -4,7 +4,7 @@ import { Link  } from 'react-router-dom';
 import { connect } from 'react-redux'
 import BreadcrumbCustom from '../../component/BreadcrumbCustom'
 import * as URL from '../../component/interfaceURL'
-import {hex_md5} from "@component/md5";
+import {hex_md5} from '../../component/md5';
 import './index.css'
 const FormItem = Form.Item;
 const { TreeNode } = Tree;
