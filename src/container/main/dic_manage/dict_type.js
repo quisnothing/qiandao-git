@@ -298,10 +298,10 @@ class DictType extends React.Component{
     AlterInfo(){
         //console.log(this.state.ref_old_info.props.value);
         const role = localStorage.getItem("type");
-        if(role !== 1){ //只有管理员才能增、删、改
-            message.error("权限不足！");
-            return;
-        }
+        // if(role !== 1){ //只有管理员才能增、删、改
+        //     message.error("权限不足！");
+        //     return;
+        // }
         let newinfo = this.state.ref_new_info;
         let token = localStorage.getItem("token");
         let type_level = this.state.ref_old_type_level;
@@ -319,10 +319,10 @@ class DictType extends React.Component{
     CreateInfos(){
         //点击左侧树拿到父节点的全部信息后,type_level+1
         const role = localStorage.getItem("type");
-        if(role !== 1){ //只有管理员才能增、删、改
-            message.error("权限不足！");
-            return;
-        }
+        // if(role !== 1){ //只有管理员才能增、删、改
+        //     message.error("权限不足！");
+        //     return;
+        // }
         let token = localStorage.getItem("token");
         let type_level = this.state.ref_old_type_level;
         let typeid = this.state.selectedTypeId;  //大类别id
@@ -344,10 +344,10 @@ class DictType extends React.Component{
     //删除具体类别
     DeleteInfos(){
         const role = localStorage.getItem("type");
-        if(role !== 1){ //只有管理员才能增、删、改
-            message.error("权限不足！");
-            return;
-        }
+        // if(role !== 1){ //只有管理员才能增、删、改
+        //     message.error("权限不足！");
+        //     return;
+        // }
         let token = localStorage.getItem("token");
         let infoid = this.state.selectedInfoId;
         URL.DelTypeInfo(token, infoid).then((res)=>{
@@ -365,10 +365,10 @@ class DictType extends React.Component{
     //修改大类
     AlterTypes(){
         const role = localStorage.getItem("type");
-        if(role !== 1){ //只有管理员才能增、删、改
-            message.error("权限不足！");
-            return;
-        }
+        // if(role !== 1){ //只有管理员才能增、删、改
+        //     message.error("权限不足！");
+        //     return;
+        // }
         let t_typename = this.state.ref_new_info;
         let token = localStorage.getItem("token");
         URL.AlterType(token, t_typename, this.state.ModalTypeId).then((res)=>{
@@ -382,10 +382,10 @@ class DictType extends React.Component{
     //新增大类
     CreateTop(){
         const role = localStorage.getItem("type");
-        if(role !== 1){ //只有管理员才能增、删、改
-            message.error("权限不足！");
-            return;
-        }
+        // if(role !== 1){ //只有管理员才能增、删、改
+        //     message.error("权限不足！");
+        //     return;
+        // }
         let t_typename = this.state.ref_new_info;
         let token = localStorage.getItem("token");
         URL.CreateType(token, t_typename).then((res)=>{
@@ -399,10 +399,10 @@ class DictType extends React.Component{
     //删除大类
     DeleteTop(){
         const role = localStorage.getItem("type");
-        if(role !== 1){ //只有管理员才能增、删、改
-            message.error("权限不足！");
-            return;
-        }
+        // if(role !== 1){ //只有管理员才能增、删、改
+        //     message.error("权限不足！");
+        //     return;
+        // }
         let token = localStorage.getItem("token");
         URL.DelType(token, this.state.ModalTypeId).then((res)=>{
             if(res.data.result_code === '200'){

@@ -1,5 +1,5 @@
 import React from 'react'
-import {Row,Col,Select,Input,Table, Icon, Divider,Button,Modal,message, Menu, Dropdown} from 'antd';
+import {Row,Col,Select,Input,Table, Icon, Divider,Button,Modal,message, Menu, Dropdown, DatePicker} from 'antd';
 import { Link  } from 'react-router-dom';
 import { connect } from 'react-redux'
 import { Form } from 'antd';
@@ -11,6 +11,20 @@ const FormItem = Form.Item;
 const Option = Select.Option;
 const Search = Input.Search;
 const ButtonGroup = Button.Group;
+
+function stampToformat(nS) {
+    var data = new Date(parseInt(nS));
+    var Y = data.getFullYear() + '-';
+    var M = (data.getMonth()+1 < 10 ? '0'+(data.getMonth()+1) : data.getMonth()+1) + '-';
+    var D = data.getDate() + ' ';
+    var h = data.getHours() + ':';
+    var m = data.getMinutes() + ':';
+    var m = data.getMinutes() + ':';
+    var s = data.getSeconds();
+    //console.log(date);
+    let date = Y+M+D;
+    return date
+}
 
 class AddClass extends React.Component{
     constructor(){
@@ -41,6 +55,7 @@ class AddClass extends React.Component{
             },
             classInfo: [], //班级信息
             pathList : ['课程管理','添加课程'],
+            addTimeStamp: ''
         };
         this.searchKey = "1";//默认按照班级搜索  1班级 2科目  3状态
         this.turnStatus = "NORMAL"; //NORMAL:正常翻页   SEARCH:搜索翻页
@@ -67,7 +82,7 @@ class AddClass extends React.Component{
                             course_name: res.data.data[i].course_name,
                             course_id : res.data.data[i].course_id,
                             teacher: res.data.data[i].teacher,
-                            time: res.data.data[i].time
+                            time: stampToformat(res.data.data[i].time)
                         });
                     }
                     this.setState({
@@ -106,7 +121,7 @@ class AddClass extends React.Component{
                         course_name: res.data.data[i].course_name,
                         course_id : res.data.data[i].course_id,
                         teacher: res.data.data[i].teacher,
-                        time: res.data.data[i].time
+                        time: stampToformat(res.data.data[i].time)
                     });
                 }
                 this.setState({
@@ -140,6 +155,7 @@ class AddClass extends React.Component{
         //然后把参数传进模态框
         //TODO : 第一次点击this.state.curSelectClass.class为空
         let t_token = localStorage.getItem("token");
+        console.log(record);
         URL.GetCourseInfo(t_token, record.course_id).then((res)=>{
             if(res.data.result_code === '200'){
                 console.log("success get course_info!");
@@ -148,13 +164,14 @@ class AddClass extends React.Component{
                 //重新设置修改模态框中三个选项的值
                 form.setFieldsValue({'name': res.data.data.course_name});
                 form.setFieldsValue({'place': res.data.data.place});
-                form.setFieldsValue({'time': res.data.data.time});
+                //form.setFieldsValue({'time': res.data.data.time});
                 form.setFieldsValue({'stu_count': res.data.data.stu_count});
                 form.setFieldsValue({'teacher': res.data.data.teacher});
                 form.setFieldsValue({'check_count': res.data.data.check_count});
                 this.setState({visibleChangeModal:true})
             }
             else{
+                console.log(res.data);
                 console.log("failed!");
             }
         });
@@ -202,17 +219,17 @@ class AddClass extends React.Component{
         this.props.form.validateFieldsAndScroll((err, values)=>{
             if(!err){
                 const role = localStorage.getItem("type");
-                if(role !== 1){ //只有管理员才能增、删、改
-                    message.error("权限不足！");
-                    return;
-                }
+                // if(role !== 1){ //只有管理员才能增、删、改
+                //     message.error("权限不足！");
+                //     return;
+                // }
                 let token1 = localStorage.getItem("token");
                 let course_id1 = this.state.currentSelectClass.course_id;
                 let course_name1 = values.name;
                 let course_code1 = this.state.currentSelectClass.course_code;
                 let place1 = values.place;
                 let location1 = this.state.currentSelectClass.location;
-                let time1 = values.time;
+                let time1 = this.state.addTimeStamp;
                 let stu_count1 = values.stu_count;
                 let teacher1 = values.teacher;
                 let c_count = values.check_count;
@@ -230,24 +247,33 @@ class AddClass extends React.Component{
         this.props.form.validateFieldsAndScroll((err, values)=>{
             if(!err){
                 const role = localStorage.getItem("type");
-                if(role !== 1){ //只有管理员才能增、删、改
-                    message.error("权限不足！");
-                    return;
-                }
                 let token = localStorage.getItem("token");
                 let uid = localStorage.getItem("uid");
+                let time1 = this.state.addTimeStamp;
                 console.log(token);
                 console.log(uid);
-                URL.CreateCourse(token, uid, values.name, values.place, values.location, values.time,
+                URL.CreateCourse(token, uid, values.name, values.place, values.location, time1,
                     values.stu_count, values.teacher).then((res)=>{
                     if(res.data.result_code === '200'){
                         console.log("success add!");
-                        //message.success('Processing complete!')
+                        message.success('Processing complete!')
                         this.setState({visibleAddModal:false});
+                    }
+                    else{
+                        console.log("fail add!");
                     }
                 })
             }
         })
+    }
+
+    dateChange(date, dateString){
+        console.log(date, dateString);
+        let temp_time = dateString+" 8:29:59";
+        temp_time = temp_time.replace(/-/g,'/');
+        let time_stamp = new Date(temp_time).getTime();
+        console.log(time_stamp);
+        this.setState({addTimeStamp: time_stamp});
     }
 
     render(){
@@ -404,9 +430,9 @@ class AddClass extends React.Component{
                             </FormItem>
                             <FormItem {...formItemLayout} label="上课时间">
                                 {getFieldDecorator('time', {
-                                    initialValue: this.state.currentSelectClass.time
+
                                 })(
-                                    <Input />
+                                    <DatePicker onChange={this.dateChange.bind(this)} />
                                 )}
                             </FormItem>
                             <FormItem {...formItemLayout} label="上课人数">
@@ -479,9 +505,9 @@ class AddClass extends React.Component{
                             </FormItem>
                             <FormItem {...formItemLayout} label="上课时间">
                                 {getFieldDecorator('time', {
-                                    initialValue: this.state.currentSelectClass.time
+
                                 })(
-                                    <Input />
+                                    <DatePicker onChange={this.dateChange.bind(this)} />
                                 )}
                             </FormItem>
                             <FormItem {...formItemLayout} label="上课人数">
