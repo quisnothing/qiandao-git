@@ -646,3 +646,107 @@ export function GetEmailCode(email) {
     // })
 }
 export const get_email_code = 'http://167.179.75.22:16666/api/user/email_code';
+
+//管理用户信息
+export function ManageUsers(token, type, page=1, count=20, uid="", nick_name="",
+                            phone="", gender="", stu_code="", school="", depart="", profess="") {
+    const manage_user = baseURL + '/api/manage/user';
+    if(type === '1'){
+        var fd = new FormData();
+        fd.append('token', token);
+        fd.append('type', type);
+        fd.append('page', page);
+        fd.append('count', count);
+        return new Promise((resolve, reject)=>{
+            axios.post(manage_user, fd, {headers: {"Content-Type": "multipart/form-data"}}
+            ).then((res)=>{
+                if(res.data.result_code ==='200'){
+                    message.success("成功获取用户信息");
+                }else{
+                    console.log(res.data);
+                    message.error("获取用户信息失败");
+                }
+                resolve(res)
+            })
+        })
+    }
+    else if(type === '2'){
+        var fd = new FormData();
+        fd.append('token', token);
+        fd.append('type', type);
+        fd.append('uid', uid);
+        fd.append('nick_name', nick_name);
+        fd.append('phone', phone);
+        fd.append('gender', gender);
+        fd.append('stu_code', stu_code);
+        fd.append('school', school);
+        fd.append('department', depart);
+        fd.append('profession', profess);
+        return new Promise((resolve, reject)=>{
+            axios.post(manage_user, fd, {headers: {"Content-Type": "multipart/form-data"}}
+            ).then((res)=>{
+                if(res.data.result_code ==='200'){
+                    message.success("成功修改用户信息");
+                }else{
+                    console.log(res.data);
+                    message.error("修改用户信息失败");
+                }
+                resolve(res)
+            })
+        })
+    }
+    else if(type === '3'){
+        var fd = new FormData();
+        fd.append('token', token);
+        fd.append('type', type);
+        fd.append('uid', uid);
+        return new Promise((resolve, reject)=>{
+            axios.post(manage_user, fd, {headers: {"Content-Type": "multipart/form-data"}}
+            ).then((res)=>{
+                if(res.data.result_code ==='200'){
+                    message.success("成功删除用户信息");
+                }else{
+                    console.log(res.data);
+                    message.error("删除用户信息失败");
+                }
+                resolve(res)
+            })
+        })
+    }
+}
+
+//获取权限列表
+export function GetPower(token, page, count) {
+    const get_power = baseURL + '/api/manage/power';
+    return new Promise((resolve, reject)=>{
+        axios.get(get_power, {params: {token: token, page: page, count: count},
+            headers: {"Content-Type": "application/json; charset=UTF-8"}}).then((res)=>{
+            resolve(res)
+        })
+    })
+}
+
+//修改权限
+export function AlterPower(token, id, mUser, mCourse, mCheck, mStudent, mDict) {
+    const alter_power = baseURL+'/api/manage/power';
+    var fd = new FormData();
+    fd.append('token', token);
+    fd.append('id', id);
+    fd.append('mUser', mUser);
+    fd.append('mCourse', mCourse);
+    fd.append('mCheck', mCheck);
+    fd.append('mStudent', mStudent);
+    fd.append('mDict', mDict);
+    return new Promise((resolve, reject)=>{
+        axios.post(alter_power, fd, {headers: {"Content-Type": "multipart/form-data"}}
+        ).then((res)=>{
+            if(res.data.result_code ==='200'){
+                message.success("成功修改权限信息");
+            }else{
+                console.log(res.data);
+                message.error("修改权限信息失败");
+            }
+            resolve(res)
+        })
+    })
+}
