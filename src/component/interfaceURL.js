@@ -198,6 +198,7 @@ export function DelStuinfo(token, uid, course_id) {
 //得到签到列表
 export function GetCheckList(token, course_id){
     const getChk = baseURL+'/api/course/checklist';
+    console.log(token, course_id);
     return new Promise((resolve, reject)=>{
         axios.get(getChk, {params: {token: token, course_id: course_id},
             headers: {"Content-Type": "application/json; charset=UTF-8"}}).then((res)=>{
@@ -701,6 +702,7 @@ export function ManageUsers(token, inter_type, page=1, count=20, uid="", nick_na
         fd.append('token', token);
         fd.append('inter_type', inter_type);
         fd.append('uid', uid);
+        console.log(uid);
         return new Promise((resolve, reject)=>{
             axios.post(manage_user, fd, {headers: {"Content-Type": "multipart/form-data"}}
             ).then((res)=>{
@@ -754,7 +756,7 @@ export function GetPower(token, page, count) {
 }
 
 //修改权限
-export function AlterPower(token, id, mUser, mCourse, mCheck, mStudent, mDict) {
+export function AlterPower(token, id, mUser, mCourse, mCheck, mStudent, mDict, mManage) {
     const alter_power = baseURL+'/api/manage/power';
     var fd = new FormData();
     fd.append('token', token);
@@ -764,6 +766,7 @@ export function AlterPower(token, id, mUser, mCourse, mCheck, mStudent, mDict) {
     fd.append('mCheck', mCheck);
     fd.append('mStudent', mStudent);
     fd.append('mDict', mDict);
+    fd.append('mManage', mManage)
     return new Promise((resolve, reject)=>{
         axios.post(alter_power, fd, {headers: {"Content-Type": "multipart/form-data"}}
         ).then((res)=>{

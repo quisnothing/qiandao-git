@@ -316,7 +316,7 @@ class AddClass extends React.Component{
                     <Link to={path1}>学生列表</Link>
                 </Menu.Item>
                 <Menu.Item>
-                    <Link to="/main/signin_manage/querySign">签到列表</Link>
+                    <Link to={path3}>签到列表</Link>
                 </Menu.Item>
             </Menu>
         );

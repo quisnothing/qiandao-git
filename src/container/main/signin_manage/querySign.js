@@ -11,7 +11,19 @@ const Search = Input.Search;
 const FormItem = Form.Item;
 const confirm = Modal.confirm;
 
-
+function stampToformat(nS) {
+    var data = new Date(parseInt(nS));
+    var Y = data.getFullYear() + '-';
+    var M = (data.getMonth()+1 < 10 ? '0'+(data.getMonth()+1) : data.getMonth()+1) + '-';
+    var D = data.getDate() + ' ';
+    var h = data.getHours() + ':';
+    var m = data.getMinutes() + ':';
+    var m = data.getMinutes() + ':';
+    var s = data.getSeconds();
+    //console.log(date);
+    let date = Y+M+D;
+    return date
+}
 class QuerySignIn extends React.Component{
     constructor(){
         super();
@@ -19,20 +31,20 @@ class QuerySignIn extends React.Component{
             selectedRowKeys : [], //选择的行
             selectedRows: [],
             data : [{
-                key: "123421",
-                id:"123421",
-                uid:"12413",
-                stu_code:"1241241",
-                name:"张三",
-                gender:"男",
-                school:"福大",
-                department:"数计学院",
-                profession:"计算机专业",
+                key: "",
+                id:"",
+                uid:"",
+                stu_code:"",
+                name:"",
+                gender:"",
+                school:"",
+                department:"",
+                profession:"",
                 phone:"",
-                count:"3",
-                check_state:"1",
-                check_time:"20124154",
-                check_location:"12542356",
+                count:"",
+                check_state:"",
+                check_time:"",
+                check_location:"",
                 remarks:"无",
                 distance:"11"
             }],
@@ -43,6 +55,7 @@ class QuerySignIn extends React.Component{
                 defaultCurrent : 1,
             },
             visibleChangeModal : false,//修改框是否显示
+            currentCourseId: '',
             curSelectRecord : {//当前所选的记录
                 key : 0,
                 id : "",
@@ -58,32 +71,48 @@ class QuerySignIn extends React.Component{
     componentWillMount(){
         this.setState({roleSet : localStorage.getItem("roleSet")});
         //需要根据传过来的course_id获得签到列表
-        let data = this.props.location.query;
+        console.log('传过来的id',this.props.location.query);
+        let c_id = '';
+        if(this.props.location.query !== undefined){
+            let data = this.props.location.query;
+            console.log(data.id);
+            c_id =data.id;
+            //this.setState({currentCourseId: data.id});
+            localStorage.setItem("currentCourseId",data.id);
+        }
+        else{
+            c_id = localStorage.getItem("currentCourseId");
+            //this.setState({currentCourseId: localStorage.getItem("currentCourseId")});
+        }
+        // let data = this.props.location.query;
+        console.log(c_id);
+        // this.setState({currentCourseId: data.a});
         let token1 = localStorage.getItem("token");
-        // URL.GetCheckList(token1, data.id).then((res)=>{
-        //     if(res.data.result_code === '200'){
-        //         console.log("success get signIn list!");
-        //         const data = [];
-        //         for (let i = 0; i < res.data.data.length; i++) {
-        //
-        //             data.push({
-        //                 key: res.data.data[i].uid,
-        //                 studentId: res.data.data[i].stu_code,
-        //                 name: res.data.data[i].name,
-        //                 check_state: res.data.data[i].check_state,
-        //                 check_count: res.data.data[i].count,
-        //                 remarks: res.data.data[i].remarks
-        //             });
-        //         }
-        //         this.setState({data: data});
-        //     }
-        //     else if(res.data.result_code === '206'){
-        //         console.log("token time out!");
-        //         message.error("token time out!");
-        //     }else{
-        //         console.log(res.data);
-        //     }
-        // })
+        URL.GetCheckList(token1, c_id).then((res)=>{
+            if(res.data.result_code === '200'){
+                console.log("success get signIn list!");
+                const data = [];
+                for (let i = 0; i < res.data.data.length; i++) {
+
+                    data.push({
+                        key: res.data.data[i].uid,
+                        uid: res.data.data[i].uid,
+                        name: res.data.data[i].name,
+                        check_state: res.data.data[i].check_state,
+                        check_time: stampToformat(res.data.data[i].check_time),
+                        count: res.data.data[i].count,
+                        remarks: res.data.data[i].remarks
+                    });
+                }
+                this.setState({data: data});
+            }
+            else if(res.data.result_code === '206'){
+                console.log(res.data);
+                //message.error("token time out!");
+            }else{
+                console.log(res.data);
+            }
+        })
     }
 
     //得到一页数据
@@ -114,10 +143,10 @@ class QuerySignIn extends React.Component{
         this.props.form.validateFieldsAndScroll((err,values)=>{
             if(!err){
                 const role = localStorage.getItem("type");
-                if(role !== 1){ //只有管理员才能增、删、改
-                    message.error("权限不足！");
-                    return;
-                }
+                // if(role !== 1){ //只有管理员才能增、删、改
+                //     message.error("权限不足！");
+                //     return;
+                // }
                 let token1 = localStorage.getItem("token");
                 URL.AlterSignList(token1, this.state.curSelectRecord.id, values.remarks,
                     this.state.selectedRows[0].distance).then((res)=>{
@@ -133,10 +162,10 @@ class QuerySignIn extends React.Component{
 
     deleteOk(){
         const role = localStorage.getItem("type");
-        if(role !== 1){ //只有管理员才能增、删、改
-            message.error("权限不足！");
-            return;
-        }
+        // if(role !== 1){ //只有管理员才能增、删、改
+        //     message.error("权限不足！");
+        //     return;
+        // }
         let token1 = localStorage.getItem("token");
         URL.DelSignList(token1, this.state.selectedRows.id).then((res)=>{
             if(res.data.result_code === '200'){
@@ -149,21 +178,17 @@ class QuerySignIn extends React.Component{
     render(){
         const {getFieldDecorator} = this.props.form;
         const columns1 = [{
-            title: '学号',
-            dataIndex:'stu_code',
-            key: 'stu_code',
+            title: '编号',
+            dataIndex:'uid',
+            key: 'uid',
         },{
             title:'姓名',
             dataIndex:'name',
             key: 'name',
         },{
-            title:'学院',
-            dataIndex:'department',
-            key: 'department',
-        },{
-            title:'专业',
-            dataIndex:'profession',
-            key: 'profession',
+            title:'时间',
+            dataIndex:'check_time',
+            key: 'check_time',
         },{
             title:'签到状态',
             dataIndex: 'check_state',
