@@ -29,6 +29,7 @@ class Login extends React.Component{
                 var u_pass = hex_md5(values.password);
                 URL.UserLogin(u_name, u_pass).then((res)=>{
                     if(res.data.result_code === '200'){
+                        console.log(res.data);
                         console.log("success login!");
                         //message.success('登录成功!');
                         console.log(res.data.data.token);

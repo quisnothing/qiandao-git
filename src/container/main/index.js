@@ -142,7 +142,7 @@ class Main extends React.Component{
                            {
                                this.state.roleSet == 1 ? <SubMenu key="dic_manage" title={<span><Icon type="user" /><span>组织管理</span></span>}>
                                        <Menu.Item key="dict_type"><Link to="/main/dic_manage/dict_type">字典信息</Link></Menu.Item>
-                                   <Menu.Item key="dict_list"><Link to="/main/dic_manage/dic_list">学校列表</Link></Menu.Item>
+                                   {/*<Menu.Item key="dict_list"><Link to="/main/dic_manage/dic_list">学校列表</Link></Menu.Item>*/}
                                    <Menu.Item key="change_information"><Link to="/main/dic_manage/user_list">角色列表</Link></Menu.Item>
                                </SubMenu> :
                                    ''

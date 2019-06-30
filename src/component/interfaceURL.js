@@ -2,6 +2,7 @@ import http from './axiosHttp'
 import {message} from 'antd'
 import axios from 'axios'
 export const baseURL = 'http://167.179.75.22:16666';
+import {hex_md5} from './md5';
 
 //用户登录
 export function UserLogin(usrname, password){
@@ -648,13 +649,13 @@ export function GetEmailCode(email) {
 export const get_email_code = 'http://167.179.75.22:16666/api/user/email_code';
 
 //管理用户信息
-export function ManageUsers(token, type, page=1, count=20, uid="", nick_name="",
-                            phone="", gender="", stu_code="", school="", depart="", profess="") {
+export function ManageUsers(token, inter_type, page=1, count=20, uid="", nick_name="",
+                            phone="", gender="", stu_code="", school="", depart="", profess="", email="", password="", type="", name="") {
     const manage_user = baseURL + '/api/manage/user';
-    if(type === '1'){
+    if(inter_type === '1'){
         var fd = new FormData();
         fd.append('token', token);
-        fd.append('type', type);
+        fd.append('inter_type', inter_type);
         fd.append('page', page);
         fd.append('count', count);
         return new Promise((resolve, reject)=>{
@@ -670,10 +671,10 @@ export function ManageUsers(token, type, page=1, count=20, uid="", nick_name="",
             })
         })
     }
-    else if(type === '2'){
+    else if(inter_type === '2'){
         var fd = new FormData();
         fd.append('token', token);
-        fd.append('type', type);
+        fd.append('inter_type', inter_type);
         fd.append('uid', uid);
         fd.append('nick_name', nick_name);
         fd.append('phone', phone);
@@ -695,10 +696,10 @@ export function ManageUsers(token, type, page=1, count=20, uid="", nick_name="",
             })
         })
     }
-    else if(type === '3'){
+    else if(inter_type === '3'){
         var fd = new FormData();
         fd.append('token', token);
-        fd.append('type', type);
+        fd.append('inter_type', inter_type);
         fd.append('uid', uid);
         return new Promise((resolve, reject)=>{
             axios.post(manage_user, fd, {headers: {"Content-Type": "multipart/form-data"}}
@@ -708,6 +709,32 @@ export function ManageUsers(token, type, page=1, count=20, uid="", nick_name="",
                 }else{
                     console.log(res.data);
                     message.error("删除用户信息失败");
+                }
+                resolve(res)
+            })
+        })
+    }
+    else if(inter_type === '4'){
+        var fd = new FormData();
+        fd.append('token', token);
+        fd.append('inter_type', inter_type);
+        fd.append('email', email);
+        fd.append('phone', phone);
+        fd.append('password', hex_md5(password));
+        fd.append('type', type);
+        fd.append('name', name);
+        fd.append('stu_code', stu_code);
+        fd.append('school', school);
+        fd.append('department', depart);
+        fd.append('profession', profess);
+        return new Promise((resolve, reject)=>{
+            axios.post(manage_user, fd, {headers: {"Content-Type": "multipart/form-data"}}
+            ).then((res)=>{
+                if(res.data.result_code ==='200'){
+                    message.success("成功创建用户");
+                }else{
+                    console.log(res.data);
+                    message.error("创建用户失败");
                 }
                 resolve(res)
             })

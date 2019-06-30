@@ -3,7 +3,7 @@ import { Row,Col,Select,Input,Table, Icon, Divider,Button,Modal,message,Form, Ca
 import { Link  } from 'react-router-dom';
 import { connect } from 'react-redux'
 import BreadcrumbCustom from '../../../component/BreadcrumbCustom'
-import httpServer from '../../../component/httpServer'
+import {hex_md5} from '../../../component/md5';
 import * as URL from '../../../component/interfaceURL'
 
 const Option = Select.Option;
@@ -11,6 +11,96 @@ const Search = Input.Search;
 const FormItem = Form.Item;
 const confirm = Modal.confirm;
 const ButtonGroup = Button.Group;
+
+let userlist = [
+    {
+        uid: 'p0001',
+        nick_name: 'yh0001',
+        name: 'jack',
+        phone: '15900000001',
+        gender: '男',
+        stu_code: '1800001',
+        school: '',
+        department: '',
+        profession: ''
+    },
+    {
+        uid: 'p0002',
+        nick_name: 'yh0002',
+        name: 'rose',
+        phone: '15900000002',
+        gender: '女',
+        stu_code: '1800002',
+        school: '',
+        department: '',
+        profession: ''
+    },
+    {
+        uid: 'p0003',
+        nick_name: 'yh0003',
+        name: 'peter',
+        phone: '15900000003',
+        gender: '男',
+        stu_code: '1800003',
+        school: '',
+        department: '',
+        profession: ''
+    },
+    {
+        uid: 'p0004',
+        nick_name: 'yh0004',
+        name: 'lucy',
+        phone: '15900000004',
+        gender: '女',
+        stu_code: '1800004',
+        school: '',
+        department: '',
+        profession: ''
+    }
+];
+
+let powerlist = [
+    {
+        id: '001',
+        uid: 'p0001',
+        mUser: 1,
+        mCourse: 1,
+        mCheck: 1,
+        mStudent: 1,
+        mDict: 1,
+        mManage: 1
+    },
+    {
+        id: '002',
+        uid: 'p0002',
+        mUser: 1,
+        mCourse: 1,
+        mCheck: 0,
+        mStudent: 1,
+        mDict: 0,
+        mManage: 0
+    },
+    {
+        id: '003',
+        uid: 'p0003',
+        mUser: 0,
+        mCourse: 1,
+        mCheck: 0,
+        mStudent: 1,
+        mDict: 1,
+        mManage: 1
+    },
+    {
+        id: '004',
+        uid: 'p0004',
+        mUser: 0,
+        mCourse: 0,
+        mCheck: 0,
+        mStudent: 1,
+        mDict: 0,
+        mManage: 0
+    },
+]
 
 class UserList extends React.Component{
     constructor(){
@@ -26,13 +116,20 @@ class UserList extends React.Component{
                 defaultCurrent:1,
             },
             visibleChangeModal: false,
+            visibleCreatModal: false,
             currentSelectRole:{
-                key:0,
-                role:'',
+                key:'',
                 uid: '',
-                role_remarks: '',
-                time:''
+                nick_name: '',
+                name: '',
+                phone: '',
+                gender: '',
+                stu_code: '',
+                school: '',
+                department: '',
+                profession: ''
             },
+            create_user_type: ''
         };
         this.turnStatus = "NORMAL"; //NORMAL:正常翻页      SEARCH: 搜索翻页
 
@@ -41,10 +138,10 @@ class UserList extends React.Component{
     //得到一页数据
     getPageDate(){
         let token = localStorage.getItem("token");
-        let type1 = "1";
+        let inter_type1 = "1";
         let page1 = this.state.pagination.current;
         let count1 = this.state.pagination.pageSize;
-        URL.ManageUsers(token, type1, page1, count1).then((res)=>{
+        URL.ManageUsers(token, inter_type1, page1, count1).then((res)=>{
             if(res.data.result_code === '200'){
                 console.log("success get!");
                 const data = [];
@@ -81,36 +178,83 @@ class UserList extends React.Component{
         })
     }
 
-    componentWillMount(){
-        if(!this.data){
-            httpServer({
-                url: URL.get_role_list
-            },{
-                token: localStorage.getItem("token"),
-                uid: localStorage.getItem("uid"),
-                type: localStorage.getItem("type")
-            }).then((res)=>{
+    //刷新列表
+    SyncOption(){
+        let token = localStorage.getItem("token");
+        let inter_type1 = "1";
+        let page1 = 1;
+        let count1 = 10;
+        URL.ManageUsers(token, inter_type1, page1, count1).then((res)=>{
+            if(res.data.result_code === '200'){
+                console.log("success get!");
                 const data = [];
-                for (let i = 0; i < res.data.data.length; i++) {
-
+                for (let i = 0; i < res.data.data.length; i++){
                     data.push({
                         key: res.data.data[i].uid,
                         uid: res.data.data[i].uid,
-                        role: res.data.data[i].role,
-                        role_remarks : res.data.data[i].role_remarks,
-                        time: res.data.data[i].time
-                    });
+                        email: res.data.data[i].email,
+                        phone: res.data.data[i].phone,
+                        password: res.data.data[i].password,
+                        nick_name: res.data.data[i].nick_name,
+                        name: res.data.data[i].name,
+                        type: res.data.data[i].type,
+                        stu_code: res.data.data[i].stu_code,
+                        gender: res.data.data[i].gender,
+                        school: res.data.data[i].school,
+                        department: res.data.data[i].department,
+                        profession: res.data.data[i].profession,
+                        face_info: res.data.data[i].face_info,
+                        avatar: res.data.data[i].avatar,
+                        last_login_time: res.data.data[i].last_login_time,
+                        reg_time: res.data.data[i].reg_time
+                    })
                 }
+                this.state.pagination.total = res.data.data.length;
                 this.setState({
                     data: data,
-                    pagination : this.state.pagination
+                    pagination: this.state.pagination
                 });
-                // if(!localStorage.getItem("subjects")){
-                //     localStorage.setItem("subjects", data);
-                // }
+            }
+            else{
+                console.log("fail get user list!");
+            }
+        })
+    }
 
-            });
+    //处理翻页
+    handleTableChange(pagination, filters, sorter){
+        const pager = this.state.pagination;
+        pager.current = pagination.current;
+        pager.pageSize = pagination.pageSize;
+        this.setState({
+            pagination: pager
+        });
+        if(this.turnStatus === "NORMAL"){
+            this.getPageDate()
         }
+    }
+
+    componentWillMount(){
+        this.getPageDate()
+        // const data = [];
+        // for (let i = 0; i < userlist.length; i++){
+        //     data.push({
+        //         key: userlist[i].uid,
+        //         uid: userlist[i].uid,
+        //         nick_name: userlist[i].nick_name,
+        //         name: userlist[i].name,
+        //         phone: userlist[i].phone,
+        //         gender: userlist[i].gender,
+        //         stu_code: userlist[i].stu_code,
+        //         school: userlist[i].school,
+        //         department: userlist[i].department,
+        //         profession: userlist[i].profession
+        //     });
+        // }
+        // this.setState({
+        //     data: data,
+        //     pagination : this.state.pagination
+        // });
     }
 
     //选择某一行
@@ -123,13 +267,33 @@ class UserList extends React.Component{
     changeCancel(){
         this.setState({visibleChangeModal:false});
     }
+    //取消创建
+    addCancel(){
+        this.setState({visibleCreatModal:false});
+    }
 
     //确认修改
     changeOK(){
-        this.setState({visibleChangeModal: false});
+        //this.setState({visibleChangeModal: false});
         this.props.form.validateFieldsAndScroll((err,values)=>{
             if(!err){
-
+                let token1 = localStorage.getItem("token");
+                let inter_type = '2';
+                let uid = this.state.currentSelectRole.uid;
+                let nick_name = values.nick_name;
+                let phone = values.phone;
+                let gender = values.gender;
+                let stu_code = values.stu_code;
+                let school = values.school;
+                let department = values.department;
+                let profession = values.profession;
+                URL.ManageUsers(token1, inter_type, 1, 20, uid, nick_name, phone, gender, stu_code,
+                    school, department, profession).then((res)=>{
+                    if(res.data.result_code === '200'){
+                        console.log("alter success!");
+                        this.setState({visibleChangeModal:false});
+                    }
+                })
             }
         });
     }
@@ -141,49 +305,115 @@ class UserList extends React.Component{
             okText: '确定',
             cancelText: '取消',
             onOk:()=>{
-
+                let token1 = localStorage.getItem("token");
+                let inter_type = '3';
+                let uid = record.key;
+                console.log(uid);
+                URL.ManageUsers(token1, inter_type, uid).then((res)=>{
+                    if(res.data.result_code === '200'){
+                        console.log("delete success!");
+                        //this.setState({visibleChangeModal:false});
+                    }
+                })
             }
         });
     }
-    //点击修改角色
+    //确认创建
+    addOK(){
+        //this.setState({visibleChangeModal: false});
+        this.props.form.validateFieldsAndScroll((err,values)=>{
+            if(!err){
+                let token1 = localStorage.getItem("token");
+                let inter_type = '4';
+                let uid = '0';
+                let nick_name = '0';
+                let gender = '0';
+                let email = values.email;
+                let name = values.name;
+                let password = values.password;
+                let phone = values.phone;
+                let type = this.state.create_user_type;
+                let stu_code = values.stu_code;
+                let school = values.school;
+                let department = values.department;
+                let profession = values.profession;
+                URL.ManageUsers(token1, inter_type, 1, 20, uid, nick_name, phone, gender, stu_code,
+                    school, department, profession, email, password, type, name).then((res)=>{
+                    if(res.data.result_code === '200'){
+                        console.log("alter success!");
+                        //this.setState({visibleCreatModal:false});
+                    }
+                })
+            }
+        });
+    }
+    //点击打开修改角色框
     changeRole(record){
         this.setState({currentSelectRole: record});
         const {form}=this.props;
-        form.setFieldsValue({'uid':record.uid});
-        form.setFieldsValue({'role':record.role});
-        form.setFieldsValue({'role_remarks': record.role_remarks});
+
         this.setState({visibleChangeModal:true});
+    }
+    //点击打开创建用户框
+    createRole(record){
+        this.setState({visibleCreatModal: true});
+    }
+    //处理类型选择
+    handleChange(value){
+        this.setState({create_user_type: value});
+        console.log(value);
+    }
+    //获取用户权限
+    getAuthority(){
+        let token1 = localStorage.getItem("token");
+        let page1 = this.state.pagination.current;
+        let count1 = this.state.pagination.pageSize;
+        URL.GetPower(token1, page1, count1).then((res)=>{
+            if(res.data.result_code === '200'){
+                console.log("获取成功");
+                message.success("成功获取权限");
+                this.setState({power: res.data.data});
+            }
+        })
     }
 
     render(){
         const {getFieldDecorator} = this.props.form;
 
-        const columns = [{
-            title: 'type',
-            dataIndex: 'uid',
-            key: 'uid',
+        const columns = [
+            {
+                title: '编号',
+                dataIndex: 'key',
+                key: 'key'
+            },
+            {
+            title: '姓名',
+            dataIndex: 'name',
+            key: 'name',
 
         },{
-            title: '角色',
-            dataIndex: 'role',
-            key: 'role',
+            title: '昵称',
+            dataIndex: 'nick_name',
+            key: 'nick_name',
         },{
-            title: '备注',
-            dataIndex: 'role_remarks',
-            key: 'role_remarks',
+            title: '手机号',
+            dataIndex: 'phone',
+            key: 'phone',
         },{
-            title: '更新时间',
-            dataIndex: 'time',
-            key: 'time',
+            title: '学校',
+            dataIndex: 'school',
+            key: 'school',
         },{
             title: '操作',
             dataIndex: 'action',
             key: 'action',
             render: (text, record)=>(
                 <span>
-                    <Button type="danger" size="small" onClick={this.deleteRole.bind(this)}>删除</Button>
+                    <Button type="danger" size="small" onClick={this.deleteRole.bind(this, record)}>删除</Button>
                     <Divider type="vertical"/>
-                    <Button size="small" onClick={this.changeRole.bind(this, record)}>修改</Button>
+                    <Button size="small" onClick={this.changeRole.bind(this, record)}>修改用户信息</Button>
+                    <Divider type="vertical"/>
+                    <Button type="dashed" onClick={this.changeRole.bind(this, record)}>修改用户权限</Button>
                 </span>
             )
         }];
@@ -210,8 +440,8 @@ class UserList extends React.Component{
                     <Row>
                         <Col span={24}>
                             <ButtonGroup className="f-r m-r-20">
-                                <Button type="primary" icon="plus" />
-                                <Button type="primary" icon="sync" />
+                                <Button type="primary" icon="plus" onClick={this.createRole.bind(this)}/>
+                                <Button type="primary" icon="sync" onClick={this.SyncOption.bind(this)}/>
                             </ButtonGroup>
                         </Col>
                     </Row>
@@ -221,28 +451,69 @@ class UserList extends React.Component{
                             dataSource={this.state.data}
                             pagination={this.state.pagination}
                             locale={localObj}
+                            onChange={this.handleTableChange.bind(this)}
                         />
                     </div>
                     <Modal
-                        title="修改角色信息"
+                        title="修改用户信息"
                         visible={this.state.visibleChangeModal}
                         footer={null}
                         onCancel={this.changeCancel.bind(this)}
                     >
                         <Form onSubmit={this.changeOK.bind(this)}>
-                            <FormItem {...formItemLayout} label="type">
-                                <span>{this.state.currentSelectRole.uid}</span>
+                            <FormItem {...formItemLayout} label="uid">
+                                {getFieldDecorator('uid', {
+
+                                })(
+                                    <span>{this.state.currentSelectRole.uid}</span>
+                                )
+                                }
                             </FormItem>
-                            <FormItem {...formItemLayout} label="角色">
-                                {getFieldDecorator('role', {
-                                    initialValue: this.state.currentSelectRole.name
+                            <FormItem {...formItemLayout} label="昵称">
+                                {getFieldDecorator('nick_name', {
+                                    initialValue: this.state.currentSelectRole.nick_name
                                 }) (
                                     <Input />
                                 )}
                             </FormItem>
-                            <FormItem {...formItemLayout} label="备注">
-                                {getFieldDecorator('role_remarks', {
-                                    initialValue: this.state.currentSelectRole.role_remarks
+                            <FormItem {...formItemLayout} label="手机号">
+                                {getFieldDecorator('phone', {
+                                    initialValue: this.state.currentSelectRole.phone
+                                }) (
+                                    <Input />
+                                )}
+                            </FormItem>
+                            <FormItem {...formItemLayout} label="性别">
+                                {getFieldDecorator('gender', {
+                                    initialValue: this.state.currentSelectRole.gender
+                                }) (
+                                    <Input />
+                                )}
+                            </FormItem>
+                            <FormItem {...formItemLayout} label="学号">
+                                {getFieldDecorator('stu_code', {
+                                    initialValue: this.state.currentSelectRole.stu_code
+                                }) (
+                                    <Input />
+                                )}
+                            </FormItem>
+                            <FormItem {...formItemLayout} label="学校">
+                                {getFieldDecorator('school', {
+                                    initialValue: this.state.currentSelectRole.school
+                                }) (
+                                    <Input />
+                                )}
+                            </FormItem>
+                            <FormItem {...formItemLayout} label="学院">
+                                {getFieldDecorator('department', {
+                                    initialValue: this.state.currentSelectRole.department
+                                }) (
+                                    <Input />
+                                )}
+                            </FormItem>
+                            <FormItem {...formItemLayout} label="专业">
+                                {getFieldDecorator('profession', {
+                                    initialValue: this.state.currentSelectRole.profession
                                 }) (
                                     <Input />
                                 )}
@@ -253,6 +524,93 @@ class UserList extends React.Component{
                                         确定
                                     </Button>
                                     <Button type="primary" className="f-r m-r-20" onClick={this.changeCancel.bind(this)}>
+                                        取消
+                                    </Button>
+                                </Col>
+                            </Row>
+                        </Form>
+                    </Modal>
+                    <Modal
+                        title="创建用户信息"
+                        visible={this.state.visibleCreatModal}
+                        footer={null}
+                        onCancel={this.addCancel.bind(this)}
+                    >
+                        <Form onSubmit={this.addOK.bind(this)}>
+                            <FormItem {...formItemLayout} label="用户名">
+                                {getFieldDecorator('email', {
+                                    rules:[{required:true, message: '请输入用户名'}],
+                                })(
+                                    <Input />
+                                )
+                                }
+                            </FormItem>
+                            <FormItem {...formItemLayout} label="姓名">
+                                {getFieldDecorator('name', {
+                                    rules:[{required:true, message: '请输入姓名'}],
+                                }) (
+                                    <Input />
+                                )}
+                            </FormItem>
+                            <FormItem {...formItemLayout} label="手机号">
+                                {getFieldDecorator('phone', {
+                                    rules:[{required:true, message: '请输入手机号'}],
+                                }) (
+                                    <Input />
+                                )}
+                            </FormItem>
+                            <FormItem {...formItemLayout} label="密码">
+                                {getFieldDecorator('password', {
+                                    rules:[{required:true, message: '请输入密码'}],
+                                }) (
+                                    <Input type="password" />
+                                )}
+                            </FormItem>
+                            <FormItem {...formItemLayout} label="用户类型">
+                                {getFieldDecorator('type', {
+                                    rules:[{required:true, message: '请选择用户类型'}],
+                                }) (
+                                    <Select style={{ width: '100%' }} onChange={this.handleChange.bind(this)}>
+                                        <Option value="3" key="3">学生</Option>
+                                        <Option value="2" key="2">教师</Option>
+                                        <Option value="1" key="1">管理员</Option>
+                                    </Select>
+                                )}
+                            </FormItem>
+                            <FormItem {...formItemLayout} label="学号">
+                                {getFieldDecorator('stu_code', {
+
+                                }) (
+                                    <Input />
+                                )}
+                            </FormItem>
+                            <FormItem {...formItemLayout} label="学校">
+                                {getFieldDecorator('school', {
+                                    rules:[{required:true, message: '请输入学校'}],
+                                }) (
+                                    <Input />
+                                )}
+                            </FormItem>
+                            <FormItem {...formItemLayout} label="学院">
+                                {getFieldDecorator('department', {
+
+                                }) (
+                                    <Input />
+                                )}
+                            </FormItem>
+                            <FormItem {...formItemLayout} label="专业">
+                                {getFieldDecorator('profession', {
+
+                                }) (
+                                    <Input />
+                                )}
+                            </FormItem>
+                            <Row>
+                                <Col span={24}>
+                                    <Button type="primary" className="f-r" htmlType="submit">
+                                        确定
+                                    </Button>
+                                    <Button type="primary" className="f-r m-r-20" onClick={this.addCancel.bind(this)}>
                                         取消
                                     </Button>
                                 </Col>
