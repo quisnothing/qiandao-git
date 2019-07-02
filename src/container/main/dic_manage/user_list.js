@@ -154,7 +154,7 @@ class UserList extends React.Component{
         let token = localStorage.getItem("token");
         let inter_type1 = "1";
         let page1 = this.state.pagination.current;
-        let count1 = this.state.pagination.pageSize;
+        let count1 = 100; //this.state.pagination.pageSize;
         URL.ManageUsers(token, inter_type1, page1, count1).then((res)=>{
             if(res.data.result_code === '200'){
                 console.log("success get!");
@@ -197,7 +197,7 @@ class UserList extends React.Component{
         let token = localStorage.getItem("token");
         let inter_type1 = "1";
         let page1 = 1;
-        let count1 = 10;
+        let count1 = 100;
         URL.ManageUsers(token, inter_type1, page1, count1).then((res)=>{
             if(res.data.result_code === '200'){
                 console.log("success get!");
@@ -243,10 +243,10 @@ class UserList extends React.Component{
         this.setState({
             pagination: pager
         });
-        if(this.turnStatus === "NORMAL"){
-            this.getPageDate()
-            this.getAuthority()
-        }
+        // if(this.turnStatus === "NORMAL"){
+        //     this.getPageDate()
+        //     this.getAuthority()
+        // }
     }
 
     componentWillMount(){
@@ -343,7 +343,7 @@ class UserList extends React.Component{
     addOK(){
         //this.setState({visibleChangeModal: false});
         this.props.form.validateFieldsAndScroll((err,values)=>{
-            if(!err){
+            if(1){
                 let token1 = localStorage.getItem("token");
                 let inter_type = '4';
                 let uid = '0';

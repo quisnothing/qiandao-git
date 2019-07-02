@@ -96,6 +96,7 @@ class QuerySignIn extends React.Component{
 
                     data.push({
                         key: res.data.data[i].uid,
+                        id: res.data.data[i].id,
                         uid: res.data.data[i].uid,
                         name: res.data.data[i].name,
                         check_state: res.data.data[i].check_state,
@@ -120,14 +121,14 @@ class QuerySignIn extends React.Component{
 
     }
     onSelectChange(selectedRowKeys, selectedRows){
-        console.log('selectedRowKeys changed: ', selectedRowKeys);
+        console.log('selectedRowKeys changed: ', selectedRows);
         this.setState({ selectedRowKeys: selectedRowKeys, selectedRows: selectedRows });
     }
 
     //打开修改签到列表界面
     ChangeSignList(record){
         let data = {key: 0};
-        data["id"] = this.state.selectedRowKeys[0];
+        data["id"] = this.state.selectedRows[0].id;
         data["stu_code"] = record.stu_code;
         data["name"] = record.name;
         data["remarks"] = record.remarks;
@@ -149,7 +150,7 @@ class QuerySignIn extends React.Component{
                 // }
                 let token1 = localStorage.getItem("token");
                 URL.AlterSignList(token1, this.state.curSelectRecord.id, values.remarks,
-                    this.state.selectedRows[0].distance).then((res)=>{
+                    "0").then((res)=>{
                     if(res.data.result_code === '200'){
                         console.log("alter success!");
                         this.setState({visibleChangeModal:false});
@@ -275,8 +276,8 @@ class QuerySignIn extends React.Component{
                             dataSource={this.state.data}
                             pagination={this.state.pagination}
                             locale={localeObj}
-
                         />
+                        <div>*勾选签到信息后，可以修改或删除对应的签到情况</div>
                     </div>:
                     <div className="m-t-20">
                         <Table
@@ -284,8 +285,8 @@ class QuerySignIn extends React.Component{
                             dataSource={this.state.data}
                             pagination={this.state.pagination}
                             locale={localeObj}
-
                         />
+                        <div>*勾选签到信息后，可以修改或删除对应的签到情况</div>
                     </div>}
                     <Modal
                         title="修改签到信息"
@@ -323,6 +324,9 @@ class QuerySignIn extends React.Component{
                         </Form>
 
                     </Modal>
+                </div>
+                <div style={{ left:'50%', bottom: '10px', position: 'fixed' }}>
+                    Ant Design ©2018 Created by Ant UED
                 </div>
             </div>
         )

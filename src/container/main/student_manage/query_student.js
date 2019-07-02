@@ -81,12 +81,21 @@ class QueryStudent extends React.Component{
         this.searchContent = "" ;//搜索内容
     }
     componentWillMount(){
-        let data = this.props.location.query;
-        console.log(data);
-        this.setState({currentCourseId: data.a});
+        let c_id = '';
+        if(this.props.location.query !== undefined){
+            let data = this.props.location.query;
+            console.log(data);
+            this.setState({currentCourseId: data.a});
+            c_id = data.a;
+            localStorage.setItem("currentCourseId",data.id);
+        }
+        else{
+            c_id = localStorage.getItem("currentCourseId");
+        }
+
         //通过传递过来的course_id获取对应的学生列表
         let token1 = localStorage.getItem("token");
-        URL.GetStuList(token1, data.a).then((res)=>{
+        URL.GetStuList(token1, c_id).then((res)=>{
             if(res.data.result_code === '200'){
                 console.log("success get student list!");
                 const data = [];
