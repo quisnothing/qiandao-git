@@ -72,17 +72,20 @@ class AddClass extends React.Component{
             URL.GetCourse(token, uid, type_1).then((res)=>{
                 if(res.data.result_code === '200'){
                     console.log("success get!");
-                    console.log(res.data);
+                    console.log(res.data.data);
 
                     const data = [];
                     for (let i = 0; i < res.data.data.length; i++) {
-
+                        let temp_time = String(res.data.data[i].time);
+                        if(temp_time.indexOf("-")=== -1){
+                            temp_time = stampToformat(res.data.data[i].time)
+                        }
                         data.push({
                             key: res.data.data[i].course_id,
                             course_name: res.data.data[i].course_name,
                             course_id : res.data.data[i].course_id,
                             teacher: res.data.data[i].teacher,
-                            time: stampToformat(res.data.data[i].time)
+                            time: temp_time
                         });
                     }
                     this.setState({
@@ -115,13 +118,16 @@ class AddClass extends React.Component{
 
                 const data = [];
                 for (let i = 0; i < res.data.data.length; i++) {
-
+                    let temp_time = String(res.data.data[i].time);
+                    if(temp_time.indexOf("-")=== -1){
+                        temp_time = stampToformat(res.data.data[i].time)
+                    }
                     data.push({
                         key: res.data.data[i].course_id,
                         course_name: res.data.data[i].course_name,
                         course_id : res.data.data[i].course_id,
                         teacher: res.data.data[i].teacher,
-                        time: stampToformat(res.data.data[i].time)
+                        time: temp_time
                     });
                 }
                 this.setState({
@@ -212,8 +218,17 @@ class AddClass extends React.Component{
             console.log("search finished!")
         })
     }
-    deleteClass(){  //删除课程
-        message.success("暂时没开放此功能！");
+    deleteClass(record){  //删除课程
+        //message.success("暂时没开放此功能！");
+        let token1 = localStorage.getItem("token");
+        //console.log(record.course_id)
+        let type1 = '3';
+        URL.DelCourse(token1, type1, record.course_id).then((res)=>{
+            if(res.data.result_code === '200'){
+                console.log("success delete course!");
+            }
+        })
+
     }
     changeOk(){  //点击确定，完成修改
         this.props.form.validateFieldsAndScroll((err, values)=>{

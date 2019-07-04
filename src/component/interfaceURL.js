@@ -384,6 +384,29 @@ export function AlterCourse(token, course_id, course_name, course_code, place, l
 }
 export const change_course = 'http://167.179.75.22:16666/api/course/info';
 
+//删除课程
+export function DelCourse(token, type, course_id){
+    const del_course = baseURL + '/api/manage/course';
+    console.log('here'+course_id);
+    var fd = new FormData();
+    fd.append('token', token);
+    fd.append('type', type);
+    fd.append('course_id', course_id);
+    return new Promise((resolve, reject)=>{
+        axios.post(del_course, fd, {headers: {"Content-Type": "multipart/form-data"}}
+        ).then((res)=>{
+            //console.log(res.data);
+            if(res.data.result_code ==='200'){
+                message.success("删除成功");
+            }else{
+                console.log(res.data)
+                message.error("删除失败");
+            }
+            resolve(res)
+        })
+    })
+}
+
 //获取课程详情
 export function GetCourseInfo(token, course_id) {
     const course_info = baseURL+'/api/course/info';
